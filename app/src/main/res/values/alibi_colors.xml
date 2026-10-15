@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="alibi_bg">#101B2B</color>
+    <color name="alibi_card">#1B2A41</color>
+    <color name="alibi_accent">#E0A526</color>
+    <color name="alibi_text">#FFFFFF</color>
+    <color name="alibi_muted">#A9B8CC</color>
+    <color name="alibi_danger">#E5573F</color>
+    <color name="alibi_success">#3DBE7A</color>
+    <color name="alibi_disabled">#3A475C</color>
+</resources>
