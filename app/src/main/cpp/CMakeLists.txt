@@ -29,8 +29,11 @@ project("thelastalibi")
 add_library(${CMAKE_PROJECT_NAME} SHARED
         native-lib.cpp
         CharacterManager.cpp
-        DialogueManager.cpp)
-
+        DialogueManager.cpp
+        Evidence.cpp
+        Location.cpp
+        InvestigationSystem.cpp
+        CaseData.cpp)
 
 
 # Specifies libraries CMake should link to your target library. You
