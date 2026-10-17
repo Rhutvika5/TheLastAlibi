@@ -25,6 +25,11 @@ public:
 
     bool collectEvidence(const std::string& evidenceId);
 
+    bool collectEvidence(
+            const std::string& locationId,
+            const std::string& evidenceId
+    );
+
     std::vector<Evidence> getCollectedEvidence() const;
 
     bool isCollected(const std::string& evidenceId) const;
