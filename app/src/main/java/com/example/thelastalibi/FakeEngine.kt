@@ -4,304 +4,428 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * TEMPORARY demo engine with Chapter 1, Level 1: "The Missing Resident".
- * Lets the UI be built and tested before the C++ engine is ready.
- * Delete (or ignore) once Game.USE_NATIVE = true.
+ * Demo engine for Chapter 1: Welcome to Greywood.
+ * Five playable levels follow the supplied story PDF. UI files are intentionally untouched.
  */
 class FakeEngine : GameEngine {
+    private data class Location(val id: Int, val name: String, val description: String)
+    private data class Clue(val id: Int, val locationId: Int, val spot: String, val name: String, val description: String, val key: Boolean)
+    private data class Question(val id: Int, val text: String, val answer: String)
+    private data class Suspect(val id: Int, val name: String, val role: String, val statement: String, val alibi: String, val motive: String, val questions: List<Question>)
+    private data class Option(val id: Int, val text: String)
+    private data class Level(val id: Int, val title: String, val subtitle: String, val intro: String, val story: List<String>, val locations: List<Location>, val clues: List<Clue>, val hint: String)
 
-    private class Location(val id: Int, val name: String, val description: String)
-    private class Clue(
-        val id: Int, val locationId: Int, val spot: String,
-        val name: String, val description: String, val key: Boolean
-    )
-    private class Question(val id: Int, val text: String, val answer: String)
-    private class Suspect(
-        val id: Int, val name: String, val role: String, val statement: String,
-        val alibi: String, val motive: String, val questions: List<Question>
-    )
-    private class Option(val id: Int, val text: String)
-
-    // ----- Chapter / level info -----
     private val chapterNumber = 1
-    private val chapterTitle = "Arrival at Greywood"
-    private val levelTitle = "The Missing Resident"
-
-    // ----- Intro story shown before the level -----
-    private val storyPages = listOf(
-        "Greywood is a town cut off from the rest of the world. After dark, its roads bend back toward the same streets, no matter which direction a traveler takes.",
-        "The townspeople have learned to fear the Echoes: strange presences that can imitate the voices of people they know. A bronze warning bell rings every night, sending a counter-tone through the town and keeping the Echoes away from their homes.",
-        "One morning, a resident named Aarav vanishes from a safe room that was locked from the inside. The door is untouched, the window is still latched, and the bell fell silent at 11:47 PM.",
-        "Aarav was once an apprentice at the town radio station. On his phone, he left one unsent message: \u201CI heard Lila. She is calling from below.\u201D",
-        "Lila is Dev's younger sister. She disappeared eight years ago. The town has spent years avoiding questions about her disappearance, the old relay station, and the voices that sometimes come through dead radios.",
-        "Now Aarav is missing, and the bell that protects Greywood has stopped. The investigation begins."
-    )
-
-    // ----- Locations -----
-    private val locations = listOf(
-        Location(1, "Aarav's Safe Room",
-            "A small, plain room with a narrow bed, a writing desk and a heavy wardrobe against one wall. The bed is empty. Nothing looks disturbed, and the door was found locked from the inside."),
-        Location(2, "Hallway",
-            "A narrow corridor outside the safe rooms. A wall monitor shows the view inside Aarav's room, and a recorder box sits beneath it."),
-        Location(3, "Bell House",
-            "A stone building at the foot of the bell tower, where the caretaker keeps his logs. The great bronze bell hangs silent above."),
-        Location(4, "Town Archive",
-            "A cramped archive of old maps, ledgers and town records. Dust lies thick on the lower shelves.")
-    )
-
-    // ----- Clues (key = needed to prove the conclusion) -----
-    private val clues = listOf(
-        Clue(1, 1, "Door and window", "Locked from Inside",
-            "The door is bolted from the inside and the window is still latched. Nobody forced either. By every sign, Aarav could not have left this room.", false),
-        Clue(2, 1, "Wardrobe against the wall", "Hidden Maintenance Hatch",
-            "Behind the wardrobe, a narrow maintenance hatch sits almost hidden in the wall. It is not locked. Someone could have crawled through it.", true),
-        Clue(3, 1, "Muddy marks on the floor", "Mud Trail",
-            "Wet mud marks the floor and trails toward the hatch, as if someone passed through it during the night.", true),
-        Clue(4, 1, "Phone on the bedside table", "Unsent Message",
-            "Aarav's phone holds one unsent message: \"I heard Lila. She is calling from below.\"", true),
-        Clue(5, 2, "Monitor above the door", "Hallway Monitor",
-            "The monitor shows Aarav sleeping peacefully in his bed. Nothing seems wrong.", false),
-        Clue(6, 2, "Recorder box under the monitor", "Looped Recording",
-            "Played back, the footage repeats the same frame after 11:47 PM. The image is not live. It is a loop.", true),
-        Clue(7, 3, "Caretaker's logbook", "Bell Log",
-            "The log confirms that the regular ringing stopped at exactly 11:47 PM.", true),
-        Clue(8, 3, "Notice above the door", "Caretaker's Rule",
-            "A painted notice: the warning bell must ring without pause from sunset to dawn.", false),
-        Clue(9, 4, "Rolled map on the long table", "Old Service Map",
-            "An old map shows service routes running beneath some of Greywood's buildings, including the safe house. One route leads out to the edge of town and ends at a small square marked 'radio shack'.", true),
-        Clue(10, 4, "Borrowing slip in the ledger", "Borrowing Slip",
-            "The map was last borrowed three weeks ago by Noah, the newest arrival in Greywood. Interest in old maps is not a crime.", false)
-    )
-
-    // ----- People the player can question -----
-    private val suspects = listOf(
-        Suspect(1, "Dr. Mira", "Town Doctor",
-            "Aarav had been frightened after hearing a familiar voice.",
-            "At home through the night, under the bell's protection until it stopped.",
-            "None known. She is one of the few people Aarav trusted.",
-            listOf(
-                Question(1, "What did Aarav tell you?",
-                    "He came to me two days ago, pale and shaking. He said he had heard a voice he knew, calling him from somewhere below. I told him it must be an Echo. He would not believe me."),
-                Question(2, "Could an Echo have taken him from a locked room?",
-                    "Echoes only speak. In all my years I have never known one to turn a latch, or to leave mud on a floor."),
-                Question(3, "Who else knew he was frightened?",
-                    "He may have told Dev. They worked together at the radio station once, before Aarav left.")
-            )),
-        Suspect(2, "Joseph", "Bell Caretaker",
-            "The warning bell should never stop between sunset and dawn.",
-            "On duty at the bell until it fell silent.",
-            "A failed bell would be blamed on him.",
-            listOf(
-                Question(1, "Why did the bell stop at 11:47?",
-                    "I wish I knew. It should never stop between sunset and dawn, not once in all my years. The log says 11:47 exactly, and that is all I can tell you."),
-                Question(2, "What did you feel when it stopped?",
-                    "The tone cut off like a thread snapping. Then the whole town felt wrong. Too quiet."),
-                Question(3, "Who else could stop the bell?",
-                    "Nobody should be able to. That is what frightens me most.")
-            )),
-        Suspect(3, "Dev", "Radio Operator",
-            "I heard nothing unusual last night.",
-            "Says he was at home all night.",
-            "His sister Lila vanished eight years ago. Any talk of voices from below touches an old wound.",
-            listOf(
-                Question(1, "Did you hear anything unusual last night?",
-                    "Nothing unusual."),
-                Question(2, "How well did you know Aarav?",
-                    "He was my apprentice at the station, years back. A good kid. Too curious for his own good."),
-                Question(3, "Aarav's message mentions Lila. Why would he?",
-                    "I do not know. And I would thank you not to say her name like that.")
-            )),
-        Suspect(4, "Noah", "Recent Arrival",
-            "Old maps show service routes running beneath some buildings.",
-            "In his rented room all night.",
-            "None known. A newcomer with no history in Greywood.",
-            listOf(
-                Question(1, "What do you know about the old maps?",
-                    "I collect old survey maps. Some show service routes beneath certain buildings: maintenance runs, pipes, cable tunnels. I assumed they were sealed long ago."),
-                Question(2, "Does any route pass under the safe house?",
-                    "One does, I think. The archive would have the map. It is old, but you can still follow the line."),
-                Question(3, "Why did you come to Greywood?",
-                    "Curiosity, and cheap rent. Everyone here keeps their secrets, I have noticed. I am only the stranger who asks too many questions.")
-            ))
-    )
-
-    // ----- Final conclusion options (id 3 is the correct one) -----
-    private val correctOptionId = 3
-    private val options = listOf(
-        Option(1, "Aarav walked out through the front door on his own."),
-        Option(2, "Joseph silenced the bell and hid Aarav himself."),
-        Option(3, "Aarav left through the hidden hatch, and the trail leads to the abandoned radio shack."),
-        Option(4, "An Echo carried Aarav out of the locked room.")
-    )
-    private val keyCluesNeeded = 4
-
+    private val chapterTitle = "Welcome to Greywood"
+    private var activeLevelId = 1
+    private val unlockedLevels = linkedSetOf(1)
     private val collected = linkedSetOf<Int>()
+    // A level advances only after its required evidence is collected AND its deduction is correct.
+    private val solvedDeductions = linkedSetOf<Int>()
     private val asked = mutableListOf<Pair<Int, Int>>()
+    private var hintsUsed = 0
+    private var caseFinished = false
 
-    private fun obj(vararg pairs: Pair<String, Any?>): JSONObject {
-        val o = JSONObject()
-        for ((k, v) in pairs) o.put(k, v)
-        return o
+    private fun obj(vararg pairs: Pair<String, Any?>): JSONObject = JSONObject().also { o -> pairs.forEach { (k, v) -> o.put(k, v) } }
+
+    private val suspects = listOf(
+        Suspect(1, "Dr. Mira", "Town Doctor", "Aarav had been frightened after hearing a familiar voice.", "At home during the night.", "She hid old records because she feared the town would panic.", listOf(
+            Question(1, "What did Aarav tell you?", "He came to me two days ago, pale and shaking. He said he had heard a voice he knew, calling him from somewhere below. I warned him it might be an Echo."),
+            Question(2, "Could an Echo take someone from a locked room?", "Echoes imitate voices. I have never known one to leave physical tracks, which is why the mud and hatch matter."),
+            Question(3, "Who else knew he was frightened?", "He may have told Dev. They worked together at the radio station years ago."),
+            Question(4, "What do you know about Lila?", "She disappeared eight years ago after an incident involving the relay. Reports of copied voices appeared afterward."),
+            Question(5, "Why did you hide the clinic records?", "I feared the town would panic if they learned the voices could imitate missing people. I was wrong to hide them.")
+        )),
+        Suspect(2, "Joseph", "Bell Caretaker", "The warning bell should never stop between sunset and dawn.", "He was on duty, but admits he missed an inspection.", "He feared being blamed for the bell's failure.", listOf(
+            Question(1, "Why did the bell stop at 11:47?", "It should never stop between sunset and dawn. The log records 11:47 exactly, but I cannot explain it."),
+            Question(2, "Did you remove the clapper?", "No. I missed an inspection and lied about it because I feared the town would blame me, but I did not remove the clapper."),
+            Question(3, "Who could access the tower?", "The restricted key is recorded in the service register. I cannot pretend that only I could reach the tower."),
+            Question(4, "What are those tool marks?", "They look fresh. Someone used a tool to remove the clapper cleanly."),
+            Question(5, "What happens if the bell stays silent?", "The counter-tone protects doorways from Echoes. Without it, the town is exposed.")
+        )),
+        Suspect(3, "Dev", "Radio Operator", "I heard nothing unusual last night.", "Claims he was at home all night.", "An Echo used Lila's voice to tempt him into silencing the bell; grief made him believe it could lead him to his missing sister.", listOf(
+            Question(1, "Did you hear anything unusual last night?", "Nothing unusual. I was home."),
+            Question(2, "How well did you know Aarav?", "He was my apprentice at the station years ago. He was curious and kept asking about old equipment."),
+            Question(3, "The radio said 'Turn the bell off.' Why?", "I don't know. I don't want to hear Lila's name used like that."),
+            Question(4, "When did you last speak to Aarav?", "A few days ago. He was asking questions about the old station. I told him to leave the past alone."),
+            Question(5, "Did you sign out a restricted key?", "That record cannot be right. I didn't think anyone kept track of that old key."),
+            Question(6, "What happened to Lila?", "An Echo sounded like her and promised I could reach my sister if I silenced the bell. I removed the clapper and activated the relay. I never meant for Aarav to vanish. I was trying to hear Lila again.")
+        )),
+        Suspect(4, "Noah", "Recent Arrival", "I copied an old map because I wanted to find a way out of Greywood.", "Says he was in his rented room; nobody can confirm it.", "He wants to escape a town whose roads loop back on themselves, not abduct Aarav.", listOf(
+            Question(1, "Why did you come to Greywood?", "I wanted to find a road out. Every road bends back into town after dark. I thought the old maps might show a route that still works."),
+            Question(2, "Why did you copy the station map?", "Because it showed service routes and an old way toward the edge of town. I hid the copy because I didn't want people stopping me from leaving."),
+            Question(3, "Does the route pass under Aarav's room?", "The old map shows a maintenance route there. I didn't know anyone would use it to reach Aarav."),
+            Question(4, "Did you go into the tunnels?", "I looked at the map, but I didn't take Aarav. I was trying to find a way out, not a way in."),
+            Question(5, "Why should we believe you?", "You shouldn't just take my word for it. Check the bell records and the restricted-key register. My map explains the route, not who silenced the bell.")
+        ))
+    )
+
+    private val levels = listOf(
+        Level(1, "The Missing Resident", "The locked room and the first clues",
+            "At sunrise, Aarav is missing from a room locked from the inside. The door is untouched, the window is latched, and Greywood's warning bell stopped at 11:47 PM. Find out how he could have left.",
+            listOf(
+                "Greywood is cut off from the rest of the world. After dark, its roads bend back toward the same streets, no matter which direction a traveler takes.",
+                "The townspeople fear the Echoes: strange presences that imitate familiar voices. A bronze warning bell rings every night, sending a counter-tone that keeps the Echoes away from homes.",
+                "One morning, Aarav vanishes from a safe room locked from the inside. The door is untouched, the window is still latched, and the bell fell silent at 11:47 PM.",
+                "Aarav was once an apprentice at the town radio station. His phone holds one unsent message: ‘I heard Lila. She is calling from below.’ Lila is Dev's younger sister, who disappeared eight years ago.",
+                "The town has avoided questions about Lila, the old relay station, and voices coming through dead radios. Now Aarav is missing, and the investigation begins."
+            ),
+            listOf(
+                Location(1, "Aarav's Safe Room", "A small room with a narrow bed, a desk and a heavy wardrobe. The bed is empty; the door was found locked from inside."),
+                Location(2, "Hallway", "A wall monitor shows the view inside Aarav's room. A recorder box sits beneath it."),
+                Location(3, "Bell House", "The caretaker keeps his logs here. The great bronze bell hangs silent above."),
+                Location(4, "Town Archive", "A cramped archive of old maps, ledgers and town records.")
+            ), listOf(
+                Clue(1, 1, "Door and window", "Locked from Inside", "The door is bolted from inside and the window is still latched. Nobody forced either.", false),
+                Clue(2, 1, "Behind the wardrobe", "Hidden Maintenance Hatch", "A narrow maintenance hatch is hidden behind the wardrobe. Someone could crawl through it.", true),
+                Clue(3, 1, "Muddy marks on the floor", "Mud Trail", "Wet mud trails toward the hatch, as if someone passed through during the night.", true),
+                Clue(4, 1, "Phone on the bedside table", "Unsent Message", "Aarav wrote: ‘I heard Lila. She is calling from below.’", true),
+                Clue(5, 2, "Monitor above the door", "Hallway Monitor", "The monitor appears to show Aarav sleeping peacefully.", false),
+                Clue(6, 2, "Recorder box", "Looped Recording", "The same frame repeats after 11:47 PM. The image is a loop, not live footage.", true),
+                Clue(7, 3, "Caretaker's logbook", "Bell Log", "The log confirms the regular ringing stopped at exactly 11:47 PM.", true),
+                Clue(8, 4, "Rolled map", "Old Service Map", "Old service routes run beneath Greywood. One route passes under the safe house and leads toward the abandoned radio shack.", true),
+                Clue(9, 4, "Archive borrowing ledger", "Noah's Map Copy", "Noah admits he copied the old station map because he wanted to find a way out of Greywood. The map may explain the route, but not who silenced the bell.", false)
+            ), "Check the wardrobe for a hidden exit, then compare the bell's stopping time with the hallway recording."),
+        Level(2, "The Voice in Static", "A message that should not exist",
+            "At the old radio shack, a dusty receiver switches on by itself. A woman's voice says, ‘Dev, it is me. Turn the bell off.’ Determine whether this is a live caller or a repeating signal.",
+            listOf(
+                "The old radio shack lies quiet at the edge of town. A dusty receiver switches on by itself, and a woman's voice comes through the static: ‘Dev, it is me. Turn the bell off.’",
+                "The burst of static repeats at exactly the same points. The receiver log names the source as OLD-STATION, an abandoned relay station. This is a repeated signal, not a live conversation.",
+                "At the clinic archive, Dr. Mira reveals that Lila vanished eight years earlier after an incident involving the relay. Reports of voices copying missing people appeared afterward.",
+                "Mira admits she hid some records because she feared the town would panic. The amplifier at the radio shack is still warm, contradicting Dev's claim that the radio stayed off all night.",
+                "Noah admits he copied an old station map to search for a way out of Greywood. The voice may explain why Dev was drawn toward the radio, but the bell sabotage is still unexplained."
+            ),
+            listOf(
+                Location(5, "Old Radio Shack", "Dusty receivers, a humming amplifier and old station equipment sit in the dark room."),
+                Location(6, "Clinic Archive", "Medical records and old reports about Lila's disappearance are kept here."),
+                Location(7, "Station Log Desk", "A receiver log and scraps of station paperwork lie beside a dead console.")
+            ), listOf(
+                Clue(10, 5, "Dusty receiver", "Lila's Voice", "A woman's voice says: ‘Dev, it is me. Turn the bell off.’ There is no caller on the line.", true),
+                Clue(11, 5, "Static playback", "Repeating Static", "The same burst of static repeats at identical intervals, showing the message is looped.", true),
+                Clue(12, 7, "Receiver log", "OLD-STATION Signal", "The receiver log names OLD-STATION, the abandoned relay station, as the signal source.", true),
+                Clue(13, 6, "Lila's clinic file", "Lila's Missing-Person File", "Lila vanished eight years ago after an incident involving the relay. Later reports describe voices imitating missing people.", true),
+                Clue(14, 5, "Amplifier casing", "Warm Amplifier", "The amplifier is still warm, contradicting Dev's claim that the radio stayed off all night.", true),
+                Clue(15, 7, "Copied station map", "Noah's Map Copy", "Noah copied the map to search for an escape route. His secrecy is suspicious, but it does not connect him to the silent bell.", false)
+            ), "Listen for a repeating sound in the static, then check the signal source and Lila's clinic file."),
+        Level(3, "The Silent Bell", "Sabotage in the tower",
+            "The bell has not simply broken. Its metal clapper has been removed cleanly, and fresh tool marks remain. Find out who had access to the tower shortly before the bell fell silent.",
+            listOf(
+                "Inside the bell tower, the metal clapper has been removed cleanly from its mount. Fresh tool marks remain. Without the clapper, the bell cannot produce the counter-tone that protects doorways from Echoes.",
+                "Joseph, the caretaker, admits he missed an inspection and lied because he feared the town would blame him. He insists he did not remove the clapper.",
+                "In the workshop, tool marks match a wrench missing from the equipment near the radio shack. A cloth wrapped around a heavy metal object carries mineral dust like the deposits near OLD-STATION.",
+                "A carbon copy of the service register shows Dev signed out a restricted key at 11:32 PM, fifteen minutes before the bell fell silent. When confronted, Dev says the record must be wrong.",
+                "The evidence points to deliberate sabotage. Joseph's lie explains his fear, and Noah's map explains his search for an escape route, but neither accounts for the missing clapper and the access record."
+            ),
+            listOf(
+                Location(8, "Bell Tower", "A narrow stone tower holds the great bronze bell and its damaged mounting."),
+                Location(9, "Caretaker's Workshop", "Tools, spare fittings and a workbench sit beneath a layer of dust."),
+                Location(10, "Service Register Office", "A small office stores copies of restricted-key records and tower service logs.")
+            ), listOf(
+                Clue(16, 8, "Bell mount", "Missing Clapper", "The clapper has been removed cleanly. Without it, the bell cannot produce its protective counter-tone.", true),
+                Clue(17, 8, "Metal fittings", "Fresh Tool Marks", "Fresh marks show that a tool was used to remove the clapper.", true),
+                Clue(18, 9, "Workshop tool rack", "Missing Wrench", "A wrench that could fit the bell mount is missing from the equipment near the radio shack.", true),
+                Clue(19, 9, "Cloth around metal", "Relay Mineral Dust", "The cloth carries mineral dust like deposits found near OLD-STATION.", true),
+                Clue(20, 10, "Carbon copy of register", "Dev's Restricted-Key Record", "Dev signed out a restricted key at 11:32 PM, fifteen minutes before the bell fell silent.", true),
+                Clue(21, 10, "Joseph's inspection notes", "Missed Inspection", "Joseph missed an inspection and lied out of fear, but the records do not show him taking the clapper.", false)
+            ), "The missing clapper proves sabotage. Compare the tool marks with the workshop and check who signed out the restricted key."),
+        Level(4, "Beneath Greywood", "The truth below the streets",
+            "Follow Noah's old map into the service tunnel beneath Aarav's room. Find Aarav, identify the source of the copied voices and learn how the bell and relay are connected.",
+            listOf(
+                "Following Noah's old map, the player enters a service tunnel beneath Aarav's room, continuing toward the abandoned station. Aarav's dropped recorder lies near a damaged hatch.",
+                "The recorder's last message contains Aarav's frightened voice. He followed Lila's voice because he believed she was calling from below, but the sound came through a speaker with no live caller behind it.",
+                "Farther underground, Aarav is found alive in a small alcove marked with a bronze symbol. The marking weakens the Echo's imitation enough to keep him safe. Aarav says the voice led him through the hatch after the bell stopped.",
+                "The tunnel opens into a relay chamber. Its log shows someone manually started the transmitter at 11:44 PM, three minutes before the bell went silent.",
+                "An engineer's notebook explains that lightning damaged the emergency relay seventeen years ago. Its repeating signal began copying voices and bending roads so travelers looped back toward town. Engineer Rowan designed the bronze bell's counter-tone to repel the Echoes.",
+                "At dawn, the bell must ring in a 2-1-2 pattern. During the brief quiet interval that follows, the relay must be switched off. Aarav is rescued, and the timing records link the relay activation to Dev's access."
+            ),
+            listOf(
+                Location(11, "Service Tunnel", "A narrow passage runs beneath Aarav's room toward the abandoned station. Mud marks follow the route."),
+                Location(12, "Relay Chamber", "An old transmitter still runs in the chamber beneath Greywood."),
+                Location(13, "Engineer's Archive", "Rowan's notebooks describe the relay, the Echoes and the bell's counter-tone.")
+            ), listOf(
+                Clue(22, 11, "Near damaged hatch", "Aarav's Recorder", "Aarav recorded that he followed Lila's voice below. The voice came from a speaker, not a live caller.", true),
+                Clue(23, 11, "Bronze-marked alcove", "Bronze Symbol", "The marking weakens the Echo's imitation. Aarav hid here and survived.", true),
+                Clue(24, 12, "Transmitter log", "Relay Activation at 11:44", "Someone manually started the transmitter at 11:44 PM, three minutes before the bell fell silent.", true),
+                Clue(25, 13, "Engineer's notebook", "Rowan's Relay Notes", "Lightning damaged the emergency relay seventeen years ago. Its repeating signal began copying voices and bending roads. The bell's counter-tone repels the Echoes.", true),
+                Clue(26, 13, "Shutdown instructions", "The 2-1-2 Pattern", "At dawn, ring the bell twice, once, then twice. During the brief quiet interval, switch off the relay.", true)
+            ), "Find Aarav's recorder and the transmitter log. Rowan's notebook explains why the bell must be restored before the relay is shut down."),
+        Level(5, "The Last Bell", "The accusation and the final ring",
+            "At dawn, confront Dev with the evidence. Then restore the clapper, ring the bell in the 2-1-2 pattern and switch off the transmitter during the quiet interval.",
+            listOf(
+                "At dawn, the player confronts Dev in the relay chamber. The repeated static matches the signal found in the radio shack. The service-key record, missing clapper and relay log place Dev at the centre of the events.",
+                "An Echo imitated Lila's voice and promised Dev he could reach his missing sister if he silenced the warning bell. Grief made him believe the promise. He removed the clapper and activated the relay, hoping to hear Lila again. He did not intend to make Aarav disappear.",
+                "When the bell's protection failed, an Echo used Lila's copied voice to lure Aarav through the maintenance hatch and into the tunnels. Mira hid records out of fear; Joseph hid his missed inspection; Noah hid his map because he wanted to escape. Dev alone caused the breach.",
+                "The player restores the clapper and rings the bell in the required pattern: two strikes, one strike, then two more. During the brief quiet interval, the transmitter is switched off. The repeating signal dies, the Echoes fade, and the roads finally lead beyond Greywood.",
+                "Aarav is safe, the mystery is solved, and as sunrise reaches the town gate, the residents begin their escape. End of Chapter 1."
+            ),
+            listOf(
+                Location(12, "Relay Chamber", "The transmitter hums beside the service-key record and the final evidence."),
+                Location(8, "Bell Tower", "The bronze bell is ready to be repaired and rung in the required pattern."),
+                Location(14, "Town Gate", "At sunrise, the road beyond the gate finally leads out of Greywood.")
+            ), listOf(
+                Clue(27, 12, "Relay console", "Matching Static Pattern", "The repeated static matches the signal recorded at the radio shack, confirming the relay's role.", true),
+                Clue(28, 12, "Service register copy", "Restricted-Key Evidence", "Dev signed out the restricted key at 11:32 PM, before the bell fell silent.", true),
+                Clue(29, 8, "Bell mount", "Clapper Restored", "The clapper is fitted back into the bell so it can produce the protective counter-tone.", true),
+                Clue(30, 8, "Bell rope", "2-1-2 Bell Pattern", "The bell rings twice, once, then twice, creating the quiet interval described by Rowan.", true),
+                Clue(31, 12, "Transmitter switch", "Relay Shut Down", "The transmitter is switched off during the quiet interval. The repeating signal dies.", true),
+                Clue(32, 14, "Gate notice board", "The Road Is Clear", "The notice confirms that the roads beyond Greywood are no longer looping. With the relay shut down and the bell restored, the residents can finally leave.", false)
+            ), "Compare Dev's key record with the clapper and relay log. Then follow Rowan's instructions: ring 2-1-2 and shut down the relay during the quiet interval.")
+    )
+
+    private val accusationOptions = listOf(
+        Option(1, "Accuse Dr. Mira, the town doctor."),
+        Option(2, "Accuse Joseph, the bell caretaker."),
+        Option(3, "Accuse Dev, the radio operator."),
+        Option(4, "Accuse Noah, the recent arrival.")
+    )
+    private val actualCulpritId = 3
+
+    private fun active(): Level = levels.first { it.id == activeLevelId }
+    private fun levelClues(level: Level = active()): List<Clue> = level.clues
+    /**
+     * Story-gated progression: the player must discover the key evidence for
+     * the current level before the next level becomes available.
+     */
+    private fun levelObjectiveComplete(levelId: Int): Boolean {
+        val requiredClues = when (levelId) {
+            // Level 1: Aarav's message points below; the service map reveals the route to the radio shack.
+            1 -> setOf(4, 8)
+            // Level 2: identify the copied voice and confirm Lila's relay history.
+            2 -> setOf(10, 13)
+            // Level 3: find the missing clapper and Dev's restricted-key record.
+            3 -> setOf(16, 20)
+            // Level 4: confirm the relay activation and learn the shutdown pattern.
+            4 -> setOf(24, 26)
+            else -> emptySet()
+        }
+        return requiredClues.isNotEmpty() && collected.containsAll(requiredClues) && levelId in solvedDeductions
+    }
+
+    private fun requiredCluesFound(levelId: Int): Boolean {
+        val requiredClues = when (levelId) {
+            1 -> setOf(4, 8)
+            2 -> setOf(10, 13)
+            3 -> setOf(16, 20)
+            4 -> setOf(24, 26)
+            else -> emptySet()
+        }
+        return requiredClues.isNotEmpty() && collected.containsAll(requiredClues)
+    }
+
+    private fun maybeUnlockNext() {
+        val l = active()
+        if (l.id < levels.size && levelObjectiveComplete(l.id)) unlockedLevels.add(l.id + 1)
+    }
+
+    private fun syncUnlockedLevels() {
+        // Recalculate sequentially from the story objectives, preserving the
+        // intended order and avoiding unlocks from random/easy clues alone.
+        for (l in levels.dropLast(1)) {
+            if (l.id in unlockedLevels && levelObjectiveComplete(l.id)) {
+                unlockedLevels.add(l.id + 1)
+            }
+        }
     }
 
     override fun getLevels(): String {
+        syncUnlockedLevels()
         val arr = JSONArray()
-        arr.put(obj(
-            "id" to 1, "chapter" to chapterNumber, "chapterTitle" to chapterTitle,
-            "title" to levelTitle, "locked" to false
+        for (l in levels) arr.put(obj(
+            "id" to l.id, "chapter" to chapterNumber, "chapterTitle" to chapterTitle,
+            "title" to l.title, "subtitle" to l.subtitle, "locked" to (l.id !in unlockedLevels),
+            "completed" to (l.id < levels.size && (l.id + 1) in unlockedLevels || (l.id == 5 && caseFinished))
         ))
         return arr.toString()
     }
 
     override fun startCase(caseId: Int) {
-        collected.clear()
-        asked.clear()
+        if (caseId in unlockedLevels && levels.any { it.id == caseId }) activeLevelId = caseId
+        hintsUsed = 0
+        caseFinished = false
+        // Question limits and clue collection persist across this chapter's levels.
     }
 
-    override fun getCaseInfo(): String = obj(
-        "title" to levelTitle,
-        "finalLabel" to "Draw Your Conclusion",
-        "question" to "What happened to Aarav?",
-        "storyPages" to JSONArray(storyPages),
-        "intro" to "Greywood is a town cut off from the rest of the world. One morning, a resident named Aarav vanished from a safe room that was locked from the inside, and the bell that protects the town fell silent at 11:47 PM. " +
-            "Search for clues, question the townspeople, and work out what happened to Aarav."
-    ).toString()
+    override fun getCaseInfo(): String {
+        val l = active()
+        return obj(
+            "title" to l.title,
+            "chapter" to chapterNumber,
+            "chapterTitle" to chapterTitle,
+            "level" to l.id,
+            "levelTitle" to l.title,
+            "subtitle" to l.subtitle,
+            "finalLabel" to if (l.id == 5) "Accuse the Suspect" else "Investigation Notes",
+            "question" to if (l.id == 5) "Who caused the breach that let the Echoes reach Greywood?" else "What does the evidence reveal?",
+            "storyPages" to JSONArray(l.story),
+            "intro" to l.intro,
+            "levelHint" to l.hint,
+            "chapterLevelCount" to levels.size
+        ).toString()
+    }
 
     override fun getLocations(): String {
+        val l = active()
         val arr = JSONArray()
-        for (l in locations) {
-            val inLoc = clues.filter { it.locationId == l.id }
-            arr.put(obj(
-                "id" to l.id, "name" to l.name, "description" to l.description,
-                "cluesFound" to inLoc.count { it.id in collected },
-                "cluesTotal" to inLoc.size
-            ))
+        for (loc in l.locations) {
+            val cluesHere = l.clues.filter { it.locationId == loc.id }
+            arr.put(obj("id" to loc.id, "name" to loc.name, "description" to loc.description,
+                "cluesFound" to cluesHere.count { it.id in collected }, "cluesTotal" to cluesHere.size))
         }
         return arr.toString()
     }
 
     override fun getLocationDetail(locationId: Int): String {
-        val l = locations.first { it.id == locationId }
+        val l = active()
+        val loc = l.locations.firstOrNull { it.id == locationId }
+            ?: return obj("id" to locationId, "name" to "Unknown location", "description" to "This location is not part of this level.", "clues" to JSONArray()).toString()
         val arr = JSONArray()
-        for (c in clues.filter { it.locationId == l.id }) {
-            arr.put(obj("id" to c.id, "spot" to c.spot, "collected" to (c.id in collected)))
-        }
-        return obj("id" to l.id, "name" to l.name, "description" to l.description, "clues" to arr).toString()
+        for (c in l.clues.filter { it.locationId == loc.id }) arr.put(obj(
+            "id" to c.id,
+            "spot" to c.spot,
+            "name" to c.name,
+            "description" to c.description,
+            // A clue counts as collected only after the player chooses Save to Journal.
+            "collected" to (c.id in collected)
+        ))
+        return obj("id" to loc.id, "name" to loc.name, "description" to loc.description, "clues" to arr).toString()
     }
 
     override fun collectClue(locationId: Int, clueId: Int): String {
-        val c = clues.firstOrNull { it.id == clueId && it.locationId == locationId }
-            ?: return obj("success" to false, "title" to "Nothing here", "message" to "There is nothing to find.").toString()
-        if (c.id in collected) {
-            return obj("success" to false, "title" to "Already collected", "message" to "You already have: ${c.name}.").toString()
-        }
+        val c = active().clues.firstOrNull { it.id == clueId && it.locationId == locationId }
+            ?: return obj("success" to false, "title" to "Nothing here", "message" to "There is nothing to find in this location for the current level.").toString()
+        if (c.id in collected) return obj("success" to false, "title" to "Already collected", "message" to "You already have: ${c.name}.").toString()
         collected.add(c.id)
-        return obj("success" to true, "title" to "Evidence found: ${c.name}", "message" to c.description).toString()
+        maybeUnlockNext()
+        val nextUnlocked = activeLevelId < levels.size && activeLevelId + 1 in unlockedLevels
+        return obj("success" to true, "title" to "Evidence found: ${c.name}", "message" to c.description,
+            "nextLevelUnlocked" to nextUnlocked, "nextLevel" to if (nextUnlocked) activeLevelId + 1 else JSONObject.NULL,
+            "cluesFound" to active().clues.count { it.id in collected }, "cluesTotal" to active().clues.size).toString()
     }
 
     override fun getSuspects(): String {
         val arr = JSONArray()
-        for (s in suspects) {
-            arr.put(obj("id" to s.id, "name" to s.name, "role" to s.role, "statement" to s.statement))
-        }
+        for (s in suspects) arr.put(obj("id" to s.id, "name" to s.name, "role" to s.role, "statement" to s.statement))
         return arr.toString()
     }
 
     override fun getSuspectDetail(suspectId: Int): String {
-        val s = suspects.first { it.id == suspectId }
+        val s = suspects.firstOrNull { it.id == suspectId }
+            ?: return obj("id" to suspectId, "name" to "Unknown suspect", "questions" to JSONArray()).toString()
         val qs = JSONArray()
-        for (q in s.questions) {
-            qs.put(obj("id" to q.id, "text" to q.text, "asked" to asked.contains(Pair(s.id, q.id))))
-        }
-        return obj(
-            "id" to s.id, "name" to s.name, "role" to s.role, "statement" to s.statement,
-            "alibi" to s.alibi, "motive" to s.motive, "questions" to qs
-        ).toString()
+        for (q in s.questions) qs.put(obj("id" to q.id, "text" to q.text, "asked" to asked.contains(Pair(s.id, q.id))))
+        val count = asked.count { it.first == s.id }
+        return obj("id" to s.id, "name" to s.name, "role" to s.role, "statement" to s.statement,
+            "alibi" to s.alibi, "motive" to s.motive, "questions" to qs,
+            "questionsAsked" to count, "questionsAllowed" to 3, "questionsRemaining" to (3 - count),
+            "questionNotice" to "You can ask only 3 questions per suspect across this chapter. Choose wisely!").toString()
     }
 
     override fun askQuestion(suspectId: Int, questionId: Int): String {
-        val s = suspects.first { it.id == suspectId }
-        val q = s.questions.first { it.id == questionId }
+        val s = suspects.firstOrNull { it.id == suspectId }
+            ?: return obj("success" to false, "suspect" to "Unknown suspect", "answer" to "This suspect could not be found.", "message" to "This suspect could not be found.").toString()
+        val q = s.questions.firstOrNull { it.id == questionId }
+            ?: return obj("success" to false, "suspect" to s.name, "answer" to "This question could not be found.", "message" to "This question could not be found.").toString()
         val key = Pair(s.id, q.id)
-        if (!asked.contains(key)) asked.add(key)
-        return obj("suspect" to s.name, "answer" to q.answer).toString()
+        val count = asked.count { it.first == s.id }
+        if (caseFinished) return obj("success" to false, "suspect" to s.name, "answer" to "The chapter has already been concluded.", "message" to "The chapter has already been concluded.", "asked" to count, "remaining" to (3 - count)).toString()
+        if (key in asked) return obj("success" to false, "suspect" to s.name, "answer" to "You've already asked this question. Choose a different one.", "message" to "You've already asked this question. Choose a different one.", "asked" to count, "remaining" to (3 - count)).toString()
+        if (count >= 3) return obj("success" to false, "suspect" to s.name, "answer" to "You've asked all 3 questions for ${s.name} across this chapter.", "message" to "You've asked all 3 questions for ${s.name} across this chapter.", "limitReached" to true, "limit" to 3, "asked" to count, "remaining" to 0).toString()
+        asked.add(key)
+        return obj("success" to true, "suspect" to s.name, "answer" to q.answer, "asked" to count + 1, "remaining" to (2 - count), "limitReached" to false).toString()
     }
 
     override fun getJournal(): String {
         val evidence = JSONArray()
-        for (c in clues.filter { it.id in collected }) {
-            val loc = locations.first { it.id == c.locationId }
-            evidence.put(obj("id" to c.id, "name" to c.name, "description" to c.description, "location" to loc.name))
+        for (c in levels.flatMap { it.clues }.filter { it.id in collected }) {
+            val loc = levels.flatMap { it.locations }.firstOrNull { it.id == c.locationId }
+            evidence.put(obj("id" to c.id, "name" to c.name, "description" to c.description, "location" to (loc?.name ?: "Unknown"), "level" to levels.first { level -> level.clues.any { it.id == c.id } }.title))
         }
         val testimony = JSONArray()
         for ((sid, qid) in asked) {
-            val s = suspects.first { it.id == sid }
-            val q = s.questions.first { it.id == qid }
+            val s = suspects.first { it.id == sid }; val q = s.questions.first { it.id == qid }
             testimony.put(obj("suspect" to s.name, "question" to q.text, "answer" to q.answer))
         }
         return obj("clues" to evidence, "testimony" to testimony).toString()
     }
 
     override fun getHint(): String {
-        val hint = when {
-            collected.isEmpty() ->
-                "Start in Aarav's safe room. Check how it was locked, and look for anything that does not belong."
-            2 !in collected ->
-                "The door is bolted and the window latched, but a room can have more than two ways out. Look behind the furniture."
-            3 !in collected ->
-                "Something carried mud into this room. Look carefully at the floor."
-            4 !in collected ->
-                "Aarav left a message on his phone. What did he hear?"
-            6 !in collected ->
-                "The hallway monitor shows Aarav asleep. But is it really live? Check the recording."
-            7 !in collected ->
-                "Greywood's bell should never stop at night. Find out exactly when it did."
-            asked.isEmpty() ->
-                "Question the townspeople. Dr. Mira, Joseph, Dev and Noah each know something."
-            9 !in collected ->
-                "Someone mentioned old maps. Where in town would old maps be kept?"
-            else ->
-                "A hatch, a mud trail, a message, a looped recording, a silent bell and a map of routes beneath the town. Where do they all point?"
+        if (caseFinished) return obj("hint" to "Chapter 1 has been concluded.", "used" to hintsUsed, "remaining" to (2 - hintsUsed), "available" to false).toString()
+        if (hintsUsed >= 2) return obj("hint" to "You've used both hints for this level. Trust your evidence.", "used" to hintsUsed, "remaining" to 0, "available" to false).toString()
+        hintsUsed++
+        val l = active()
+        val objectiveIds = when (l.id) {
+            1 -> listOf(4, 8)
+            2 -> listOf(10, 13)
+            3 -> listOf(16, 20)
+            4 -> listOf(24, 26)
+            else -> emptyList()
         }
-        return obj("hint" to hint).toString()
+        val missingObjective = l.clues.firstOrNull { it.id in objectiveIds && it.id !in collected }
+        val uncollected = l.clues.firstOrNull { it.id !in collected }
+        val hint = when {
+            missingObjective != null -> "${l.hint} To unlock the next level, find this key evidence: ${missingObjective.name} at ${missingObjective.spot}."
+            l.id < 5 && levelObjectiveComplete(l.id) -> "You've found the key evidence. Return to the level list and open Level ${l.id + 1}."
+            uncollected != null -> "${l.hint} First, inspect: ${uncollected.spot}."
+            l.id < 5 -> "You've gathered the clues, but check the key evidence listed in your journal to unlock Level ${l.id + 1}."
+            else -> "Use the restricted-key record, missing clapper and relay log. Dev caused the breach; Noah's map explains the route, not the sabotage."
+        }
+        return obj("hint" to hint, "used" to hintsUsed, "remaining" to (2 - hintsUsed), "available" to (hintsUsed < 2)).toString()
     }
 
     override fun getAccusationOptions(): String {
         val arr = JSONArray()
+        val options = when (activeLevelId) {
+            1 -> listOf(Option(1, "Blame Noah for taking Aarav"), Option(2, "Follow the hatch route to the radio shack"), Option(3, "Assume Aarav left through the locked door"))
+            2 -> listOf(Option(1, "The voice is a repeating Echo signal linked to the old relay"), Option(2, "Lila is calling live from the radio"), Option(3, "The static proves Noah silenced the bell"))
+            3 -> listOf(Option(1, "Joseph removed the clapper because he missed inspection"), Option(2, "The clapper fell off by itself"), Option(3, "The missing clapper and Dev's restricted-key record point to sabotage by Dev"))
+            4 -> listOf(Option(1, "Keep the bell silent and follow the voice"), Option(2, "Ring the bell in a 2-1-2 pattern, then shut down the relay during the quiet interval"), Option(3, "Switch off the relay before restoring the bell"))
+            else -> accusationOptions
+        }
         for (o in options) arr.put(obj("id" to o.id, "text" to o.text))
         return arr.toString()
     }
 
     override fun accuse(optionId: Int): String {
-        val keyFound = clues.count { it.key && it.id in collected }
-        val total = clues.size
-        val found = collected.size
-
-        return if (optionId == correctOptionId) {
-            if (keyFound >= keyCluesNeeded) {
-                obj(
-                    "outcome" to "PROVED", "title" to "A Lead Found", "label" to "Conclusion proved",
-                    "message" to "Aarav did not vanish through the locked door. He left through the hidden maintenance hatch behind the wardrobe, and the mud trail shows which way he went.\n\n" +
-                        "The hallway recording was a loop after 11:47 PM, so someone wanted the room to look quiet. The bell stopped at the very same moment, and Greywood's protection failed that night. " +
-                        "Aarav's message, the mud trail and the old service map all point to the same place: the abandoned radio shack at the edge of town.\n\n" +
-                        "Who looped the recording? Who silenced the bell? And whose voice was calling from below? The answers wait at the radio shack.",
-                    "cluesFound" to found, "cluesTotal" to total
-                ).toString()
-            } else {
-                obj(
-                    "outcome" to "INSUFFICIENT", "title" to "Not Enough Proof", "label" to "Right idea, not enough proof",
-                    "message" to "You are leaning in the right direction, but your evidence is too thin to stand up. " +
-                        "Search the locations again and question the townspeople, then return with more proof.",
-                    "cluesFound" to found, "cluesTotal" to total
-                ).toString()
+        if (activeLevelId != 5) {
+            val correctOption = when (activeLevelId) { 1 -> 2; 2 -> 1; 3 -> 3; 4 -> 2; else -> -1 }
+            val next = activeLevelId + 1
+            if (optionId !in 1..3) return obj("outcome" to "INVALID", "title" to "Choose a deduction", "label" to "No deduction selected", "message" to "Choose one of the investigation theories.", "cluesFound" to collected.size, "cluesTotal" to levels.sumOf { it.clues.size }, "caseFinished" to false).toString()
+            if (!requiredCluesFound(activeLevelId)) {
+                val missing = when (activeLevelId) {
+                    1 -> listOf(4 to "Unsent Message", 8 to "Old Service Map")
+                    2 -> listOf(10 to "Lila's Voice", 13 to "Lila's Missing-Person File")
+                    3 -> listOf(16 to "Missing Clapper", 20 to "Dev's Restricted-Key Record")
+                    else -> listOf(24 to "Relay Activation at 11:44", 26 to "The 2-1-2 Pattern")
+                }.filter { it.first !in collected }.joinToString(" and ") { it.second }
+                return obj("outcome" to "INSUFFICIENT", "title" to "More evidence needed", "label" to "Deduction not available yet",
+                    "message" to "Investigate the required evidence first: $missing. Finding every clue is not necessary—only the key evidence matters.",
+                    "cluesFound" to collected.size, "cluesTotal" to levels.sumOf { it.clues.size }, "caseFinished" to false).toString()
             }
-        } else {
-            obj(
-                "outcome" to "FALSE", "title" to "Theory Not Supported", "label" to "Theory not supported",
-                "message" to "The evidence does not support that theory. Look again at the locked room, the hatch and the trail, " +
-                    "and compare what each person told you with what you found.",
-                "cluesFound" to found, "cluesTotal" to total
-            ).toString()
+            if (optionId != correctOption) return obj("outcome" to "FALSE", "title" to "Deduction rejected", "label" to "That theory does not fit the evidence",
+                "message" to "Not quite. Re-read the key evidence and try a different deduction. You have not lost your progress.",
+                "cluesFound" to collected.size, "cluesTotal" to levels.sumOf { it.clues.size }, "caseFinished" to false).toString()
+            solvedDeductions.add(activeLevelId)
+            maybeUnlockNext()
+            val unlocked = next in unlockedLevels
+            return obj("outcome" to "CONTINUE", "title" to "Deduction accepted!", "label" to "Level ${activeLevelId} solved",
+                "message" to "Correct deduction. The evidence supports this conclusion, and Level $next is now unlocked. Return to Choose a Case to continue.",
+                "cluesFound" to collected.size, "cluesTotal" to levels.sumOf { it.clues.size },
+                "caseFinished" to false, "nextLevelUnlocked" to unlocked, "nextLevel" to if (unlocked) next else JSONObject.NULL).toString()
         }
+        val selected = accusationOptions.firstOrNull { it.id == optionId }
+            ?: return obj("outcome" to "INVALID", "title" to "Choose a suspect", "label" to "No accusation selected", "message" to "Choose one of the four suspects.", "cluesFound" to collected.size, "cluesTotal" to levels.sumOf { it.clues.size }, "caseFinished" to false).toString()
+        val correct = optionId == actualCulpritId
+        caseFinished = true
+        val found = collected.size
+        val total = levels.sumOf { it.clues.size }
+        val truth = "Dev caused the breach, though he did not intend to make Aarav disappear. An Echo imitated Lila's voice and promised Dev he could reach his missing sister if he silenced the warning bell. Grief made him believe it. He removed the clapper and activated the old relay, hoping to hear Lila again. Once the bell's protection failed, an Echo used Lila's copied voice to lure Aarav through the maintenance hatch and into the tunnels. Mira hid old reports because she feared panic. Joseph hid his missed inspection because he feared blame. Noah kept the station map because he wanted to escape a town whose roads never led away. The service-key record, missing clapper and relay log point to Dev."
+        val ending = "$truth\n\nAt dawn, restore the clapper and ring the bell in a 2-1-2 pattern: two strikes, one strike, then two more. During the brief quiet interval, switch off the transmitter. The repeating signal dies, the Echoes fade, and Greywood's roads finally lead beyond the town. Aarav is safe. End of Chapter 1."
+        val selectedText = selected.text.removePrefix("Accuse ").removeSuffix(".")
+        val message = if (correct) "You accused $selectedText. The evidence supports your conclusion.\n\n$ending" else "You accused $selectedText, but the evidence points to Dev, the radio operator.\n\n$ending"
+        return obj("outcome" to if (correct) "PROVED" else "FALSE", "title" to if (correct) "Chapter Complete!" else "Wrong Suspect",
+            "label" to if (correct) "You identified who caused the breach" else "The evidence points to Dev",
+            "message" to message, "correct" to correct, "selectedOptionId" to selected.id, "correctOptionId" to actualCulpritId,
+            "accusedSuspect" to selected.text, "actualCulprit" to "Dev", "cluesFound" to found, "cluesTotal" to total,
+            "caseFinished" to true, "chapterFinished" to true).toString()
     }
 }

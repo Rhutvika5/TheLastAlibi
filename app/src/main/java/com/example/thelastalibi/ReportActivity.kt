@@ -21,12 +21,13 @@ class ReportActivity : BaseScreen() {
 
         val outcomeColor = when (outcome) {
             "PROVED" -> color(R.color.alibi_success)
-            "INSUFFICIENT" -> color(R.color.alibi_accent)
+            "INSUFFICIENT", "CONTINUE" -> color(R.color.alibi_accent)
             else -> color(R.color.alibi_danger)
         }
         val defaultLabel = when (outcome) {
             "PROVED" -> "Case proved"
             "INSUFFICIENT" -> "Right idea, not enough proof"
+            "CONTINUE" -> "Deduction accepted"
             else -> "Not supported by the evidence"
         }
         // The engine can supply its own label (e.g. "Conclusion proved")
@@ -49,7 +50,7 @@ class ReportActivity : BaseScreen() {
             startActivity(intent)
             finish()
         }
-        if (outcome == "PROVED") {
+        if (outcome == "PROVED" && result.optBoolean("chapterFinished", false)) {
             addButton("Replay This Case") {
                 Game.engine.startCase(1)
                 val intent = Intent(this, HubActivity::class.java)

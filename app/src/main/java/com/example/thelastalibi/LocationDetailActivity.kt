@@ -22,8 +22,17 @@ class LocationDetailActivity : BaseScreen() {
                 addButton("✔ $spot (collected)", false) { }
             } else {
                 addButton("Examine: $spot") {
-                    val r = JSONObject(Game.engine.collectClue(id, clueId))
-                    showMessage(r.getString("title"), r.getString("message")) { refresh() }
+                    val clueName = c.optString("name", spot)
+                    val clueDescription = c.optString("description", "Examine this evidence carefully.")
+                    android.app.AlertDialog.Builder(this)
+                        .setTitle(clueName)
+                        .setMessage(clueDescription + "\n\nWould you like to keep this evidence in your Evidence Journal?")
+                        .setPositiveButton("Save to Journal") { _, _ ->
+                            val r = JSONObject(Game.engine.collectClue(id, clueId))
+                            showMessage(r.getString("title"), r.getString("message")) { refresh() }
+                        }
+                        .setNegativeButton("Leave it") { _, _ -> }
+                        .show()
                 }
             }
         }
