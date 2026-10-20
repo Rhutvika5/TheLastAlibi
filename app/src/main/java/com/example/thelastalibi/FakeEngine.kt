@@ -22,7 +22,7 @@ class FakeEngine : GameEngine {
     private val collected = linkedSetOf<Int>()
     // A level advances only after its required evidence is collected AND its deduction is correct.
     private val solvedDeductions = linkedSetOf<Int>()
-    private val asked = mutableListOf<Pair<Int, Int>>()
+    private val asked = mutableListOf<Triple<Int, Int, Int>>()
     private var hintsUsed = 0
     private var caseFinished = false
 
@@ -58,6 +58,158 @@ class FakeEngine : GameEngine {
             Question(4, "Did you go into the tunnels?", "I looked at the map, but I didn't take Aarav. I was trying to find a way out, not a way in."),
             Question(5, "Why should we believe you?", "You shouldn't just take my word for it. Check the bell records and the restricted-key register. My map explains the route, not who silenced the bell.")
         ))
+    )
+
+
+    // Each suspect has a fresh set of six questions in every level.
+    // Asked-question tracking includes the level, so a question asked in Level 1
+    // does not consume the player's allowance in Level 2.
+    private val levelQuestions: Map<Pair<Int, Int>, List<Question>> = mapOf(
+        // LEVEL 1 — The Missing Resident
+        (1 to 1) to listOf(
+            Question(1, "What did Aarav tell you before he vanished?", "He said a familiar voice was calling from below. I warned him that an Echo could imitate someone he trusted."),
+            Question(2, "Could the locked room really have another exit?", "I did not inspect the room myself, but a hidden maintenance hatch would explain why the door and window were untouched."),
+            Question(3, "Why did you keep Lila's history quiet?", "I feared panic. The clinic records show Lila disappeared after the relay incident, and I should not have hidden that."),
+            Question(4, "What should we check first in the safe room?", "Inspect the wardrobe and the mud trail. The locked door alone does not prove nobody could leave."),
+            Question(5, "Can the hallway monitor be trusted?", "Not until the recorder box is checked. The footage may be a loop rather than a live view."),
+            Question(6, "Which clue connects Aarav to the underground route?", "His unsent message says Lila was calling from below, and the old service map shows a route beneath the safe house.")),
+        (2 to 1) to listOf(
+            Question(1, "Why did you miss an inspection?", "I was distracted and missed it. I lied because I feared the town would blame me for the bell's failure."),
+            Question(2, "Does the bell log show when it stopped?", "Yes. It records 11:47 PM. That is unusual; the bell should ring until dawn."),
+            Question(3, "Could someone leave the tower without using the front door?", "The service routes connect old buildings. Check the archive map before deciding how Aarav left."),
+            Question(4, "Why does 11:47 PM matter?", "That is when the bell log says the ringing stopped. Compare it with the monitor recording and the other access records."),
+            Question(5, "What can the service map establish?", "It shows that an underground route exists, but it cannot identify who used it."),
+            Question(6, "What did you leave out of your inspection report?", "I was afraid of being blamed, so I left out how unusual the bell timing was. That was wrong.")),
+        (3 to 1) to listOf(
+            Question(1, "When did you last see Aarav?", "A few days before he disappeared. He was asking about old radio equipment and the service routes."),
+            Question(2, "Why would you know about the maintenance hatch?", "I trained Aarav at the station, so I knew the town had old service passages. I did not expect him to follow a voice underground."),
+            Question(3, "What did the message about Lila mean?", "I wanted to believe it was really her. I cannot explain how the voice reached him, and I do not want to discuss it."),
+            Question(4, "What did Aarav ask you about before vanishing?", "He asked about the station and the old service routes. I did not realize he was following a voice."),
+            Question(5, "Can the unsent message prove Lila was alive?", "No. It proves Aarav believed he heard her voice, not that Lila was actually speaking."),
+            Question(6, "What evidence would separate a route from a motive?", "The map shows where someone could travel. The bell log and recording help establish what happened that night.")),
+        (4 to 1) to listOf(
+            Question(1, "Why did you copy the old station map?", "I wanted to find a road out of Greywood. The map shows service routes, including one beneath the safe house."),
+            Question(2, "Did you take Aarav through the hatch?", "No. I copied the map to escape, not to abduct anyone. The map explains a possible route, not who used it."),
+            Question(3, "Did you know the bell had stopped?", "I heard people talking about it at dawn. I cannot say what happened inside Aarav's room."),
+            Question(4, "Did the map show a route to the safe house?", "Yes, an old service passage runs beneath it. That makes the hatch plausible, but it does not prove who used it."),
+            Question(5, "Why did you not tell the others about your map?", "I wanted a way out and feared the town would stop me. I should have shared the route once Aarav vanished."),
+            Question(6, "What is your strongest evidence against a simple locked-room explanation?", "The hidden hatch and muddy trail suggest another exit, while the locked door and latched window are still intact.")),
+        // LEVEL 2 — The Voice in Static
+        (1 to 2) to listOf(
+            Question(1, "What does the repeating static tell us?", "If the same burst repeats at identical intervals, it is likely a looped recording rather than a live caller."),
+            Question(2, "What did Lila's clinic file say?", "Lila disappeared eight years ago after an incident involving the relay. Later reports mention voices imitating missing people."),
+            Question(3, "Why was the amplifier warm?", "It suggests the equipment had been running recently, despite claims that the radio stayed off."),
+            Question(4, "How can we tell whether the radio voice is live?", "Compare the static bursts. Identical timing points to a looped signal, not a live caller."),
+            Question(5, "Why should OLD-STATION be investigated?", "The receiver log names it as the source, so the signal can be traced to the abandoned relay."),
+            Question(6, "What did the warm amplifier tell you?", "Someone had powered the equipment recently, despite the claim that the radio stayed off.")),
+        (2 to 2) to listOf(
+            Question(1, "Was the bell already silent when you checked the log?", "The log shows the silence began at 11:47 PM. I cannot explain the radio message, but the timing matters."),
+            Question(2, "Could the bell protect people from the voice?", "The bell produces a counter-tone that repels Echoes. With the bell silent, the town loses that protection."),
+            Question(3, "Did you authorize work at OLD-STATION?", "No official repair was scheduled. The transmitter log and key register should show who accessed restricted equipment."),
+            Question(4, "What does the repeating static rule out?", "It makes an ordinary live conversation unlikely. The repeated pattern suggests recorded or relayed audio."),
+            Question(5, "Why were Lila’s records kept in the clinic archive?", "They document her disappearance after the relay incident and reports that followed it."),
+            Question(6, "What should investigators compare next?", "The receiver log, amplifier condition and clinic file. Together they link the voice to the old relay history.")),
+        (3 to 2) to listOf(
+            Question(1, "Was the voice really Lila?", "I wanted it to be her. The signal used her voice, but the repeating pattern suggests an Echo or recording, not Lila speaking live."),
+            Question(2, "Why did you turn the bell off?", "I did not think the voice was dangerous. I cannot explain the timing, and I do not want to talk about Lila."),
+            Question(3, "What was the amplifier doing?", "The old relay can repeat a signal. If the amplifier was warm, someone had powered the equipment recently."),
+            Question(4, "Could the signal really have been Lila?", "I wanted it to be her, but the repeating pattern suggests an Echo or recording rather than Lila speaking live."),
+            Question(5, "What made you believe the voice?", "It sounded like my sister and seemed to know what I wanted to hear. I ignored the signs that it was repeating."),
+            Question(6, "What evidence links the voice to the station?", "The receiver log names OLD-STATION and the static repeats at identical intervals.")),
+        (4 to 2) to listOf(
+            Question(1, "What did the receiver log say?", "It named OLD-STATION as the source. That is the abandoned relay, not a normal live radio caller."),
+            Question(2, "Why hide your copy of the map?", "I thought the map might help me leave. I did not want the town to stop me, but I did not create the signal."),
+            Question(3, "Did you hear Lila's voice yourself?", "I heard reports of it, but I was focused on finding a route out. Check the receiver log to verify the source."),
+            Question(4, "Why was OLD-STATION written in the receiver log?", "It identifies the abandoned relay as the signal source, giving investigators a place to examine."),
+            Question(5, "Does your copied map explain the radio voice?", "No. It explains a possible escape route, not the signal or the bell sabotage."),
+            Question(6, "What should be preserved at the shack?", "The receiver log, static playback and warm amplifier should be documented before anyone changes the equipment.")),
+        // LEVEL 3 — The Silent Bell
+        (1 to 3) to listOf(
+            Question(1, "Could the missing clapper have been removed deliberately?", "Fresh tool marks suggest someone removed it with a tool. It does not look like ordinary wear."),
+            Question(2, "Does Dev's key record matter?", "Yes. A restricted-key entry at 11:32 PM places access shortly before the bell stopped."),
+            Question(3, "Why was the clinic file important?", "It connects Lila's disappearance to the relay, giving a reason someone might be drawn to the voice."),
+            Question(4, "What makes the clapper removal look deliberate?", "The clapper is missing cleanly and fresh tool marks remain around its mount."),
+            Question(5, "Why compare the key register with the bell log?", "The restricted-key entry at 11:32 PM is close to the 11:47 PM silence, so the timing may matter."),
+            Question(6, "Could the missing wrench be relevant?", "Yes. The tool marks and missing wrench may connect the workshop evidence to the tower, but they need to be compared carefully.")),
+        (2 to 3) to listOf(
+            Question(1, "Did you remove the clapper?", "No. I missed an inspection and lied out of fear, but the missing clapper and key register must be considered separately."),
+            Question(2, "What do the tool marks show?", "They look fresh and consistent with a tool being used on the mount. A missing wrench may help explain how it was done."),
+            Question(3, "Who signed out the restricted key?", "The register should answer that. I cannot change the written entry; check the time and name carefully."),
+            Question(4, "Was the clapper damaged by ordinary wear?", "The fresh marks and clean removal suggest deliberate work rather than ordinary wear."),
+            Question(5, "What did the key register show?", "It records restricted-key access at 11:32 PM. Investigators should verify the entry against the bell timeline."),
+            Question(6, "Why did you lie about the inspection?", "I feared the town would blame me. My lie was wrong, but it is not proof that I removed the clapper.")),
+        (3 to 3) to listOf(
+            Question(1, "Did you sign out the restricted key at 11:32?", "That record cannot be right. I did not expect anyone to keep track of that old key."),
+            Question(2, "Why was the bell clapper removed?", "I thought the voice might lead me to Lila. I wanted the bell silent, but I never meant for Aarav to vanish."),
+            Question(3, "What connects the bell to the radio station?", "The relay signal and the bell's counter-tone are connected. I should have left the bell alone."),
+            Question(4, "What evidence places you near the tower?", "The restricted-key register records access at 11:32 PM. I cannot dismiss that entry just because it is uncomfortable."),
+            Question(5, "Why was the wrench missing?", "The tool evidence suggests a wrench may have been used on the clapper mount. I need to explain why the records connect to me."),
+            Question(6, "What did you misunderstand about the voice?", "I wanted it to lead me to Lila, so I ignored the danger of silencing the bell.")),
+        (4 to 3) to listOf(
+            Question(1, "Does the map prove I removed the clapper?", "No. The map only shows a route. The restricted-key record and the tool evidence are more relevant to the sabotage."),
+            Question(2, "Could I have reached the tower?", "The service routes make access possible, but they do not prove I entered the tower or removed anything."),
+            Question(3, "Why should the key register be checked?", "It records who signed out a restricted key and when. That is stronger evidence than a guess based on my map."),
+            Question(4, "Does the service map identify who removed the clapper?", "No. It only shows routes through town. The key register and tool marks are more directly relevant."),
+            Question(5, "What timeline should investigators build?", "Compare the 11:32 PM key entry, the 11:47 PM bell silence and the condition of the clapper mount."),
+            Question(6, "Why is the missing wrench important?", "It may match the fresh marks on the mount, helping test whether the sabotage was deliberate.")),
+        // LEVEL 4 — Beneath Greywood
+        (1 to 4) to listOf(
+            Question(1, "What does Aarav's recorder reveal?", "He followed a voice that came through a speaker. There was no live caller guiding him."),
+            Question(2, "How can the relay be shut down safely?", "Restore the bell and ring the 2-1-2 pattern first. Switch off the relay during the quiet interval."),
+            Question(3, "Why did you not report the old relay damage?", "I feared the town would panic, but the notebook explains the danger and should have been shared."),
+            Question(4, "What did Aarav record about the voice?", "The recorder suggests he followed a voice coming through a speaker, not a live caller."),
+            Question(5, "Why must the bell be restored before shutting down the relay?", "The bell’s counter-tone protects the town. The 2-1-2 pattern creates the quiet interval for safely switching off the relay."),
+            Question(6, "What warning was written in the notebook?", "The old relay can imitate missing people and becomes dangerous when the bell’s counter-tone is absent.")),
+        (2 to 4) to listOf(
+            Question(1, "What is the purpose of the bell's counter-tone?", "It repels the Echoes and protects doorways. The relay's copied signal became dangerous after the bell was silenced."),
+            Question(2, "When did the transmitter start?", "The relay log shows a manual start at 11:44 PM, three minutes before the bell went silent."),
+            Question(3, "What should happen before the relay is switched off?", "The bell must be restored and rung in the 2-1-2 pattern. Then the relay is shut down in the quiet interval."),
+            Question(4, "What does the 11:44 PM transmitter log establish?", "It records a manual start three minutes before the bell went silent, which is a key part of the timeline."),
+            Question(5, "Why is the 2-1-2 pattern necessary?", "It restores the bell’s protective counter-tone and creates a quiet interval for the relay shutdown."),
+            Question(6, "What does the relay chamber tell us about the signal?", "The transmitter was manually activated, supporting the evidence that the voice came through the old relay.")),
+        (3 to 4) to listOf(
+            Question(1, "Did you activate the relay at 11:44?", "I wanted to hear Lila again. The voice promised me I could reach her if I silenced the bell."),
+            Question(2, "Did you know Aarav would follow the voice?", "No. I did not intend for Aarav to disappear. I only wanted to hear my sister's voice again."),
+            Question(3, "How can we stop the Echo now?", "Restore the clapper, ring the bell twice, once, then twice again, and switch off the relay during the quiet interval."),
+            Question(4, "What made you activate the relay?", "I wanted to hear Lila again and believed the voice’s promise. I let grief override the warning signs."),
+            Question(5, "Did you understand what silencing the bell would do?", "I knew the bell protected the town, but I convinced myself I could control the relay. I was wrong."),
+            Question(6, "What is the safest way to end the signal?", "Restore the clapper, ring the 2-1-2 pattern, then shut down the relay during the quiet interval.")),
+        (4 to 4) to listOf(
+            Question(1, "Did the tunnel map lead you to Aarav?", "It showed the service route, but I did not know Aarav was down there. I wanted to find a way out of town."),
+            Question(2, "What did the relay chamber log prove?", "It records the transmitter starting at 11:44 PM. That timing connects the relay activity to the bell failure."),
+            Question(3, "Why is Rowan's notebook important?", "It explains that lightning damaged the relay and that the bell's counter-tone can repel the Echoes."),
+            Question(4, "What did the tunnel map actually prove?", "It showed a service route, not that I abducted Aarav or sabotaged the bell."),
+            Question(5, "How do the notebook and relay log fit together?", "The notebook explains the danger of the signal, while the log records when the transmitter was activated."),
+            Question(6, "Why should the recorder be treated as evidence?", "It captures what Aarav heard and helps show that the voice came through a speaker rather than a live caller.")),
+        // LEVEL 5 — The Last Bell
+        (1 to 5) to listOf(
+            Question(1, "Does the evidence support Dev's confession?", "The restricted-key record, relay activation and missing clapper all support the conclusion that Dev caused the breach."),
+            Question(2, "Why did Dev silence the bell?", "He believed an Echo imitating Lila could lead him to his missing sister. Grief made him trust the voice."),
+            Question(3, "What final action protects Greywood?", "Restore the clapper, ring the bell in a 2-1-2 pattern, then shut down the relay during the quiet interval."),
+            Question(4, "Which records support the final conclusion?", "The restricted-key register, relay activation log and missing clapper all support the conclusion that the bell was sabotaged deliberately."),
+            Question(5, "What does Dev’s confession explain?", "It explains why the relay was activated and why the bell was silenced: Dev hoped to hear Lila again."),
+            Question(6, "How do we know the town can be safe again?", "The bell must be restored and rung in the 2-1-2 pattern before the relay is switched off during the quiet interval.")),
+        (2 to 5) to listOf(
+            Question(1, "Did you remove the clapper?", "No. I lied about missing an inspection, but the evidence points to Dev's key access and relay activity."),
+            Question(2, "What happens when the bell rings again?", "Its counter-tone repels the Echoes. The 2-1-2 pattern creates the quiet interval needed to shut down the relay."),
+            Question(3, "Can the town safely leave now?", "Once the relay is shut down and the bell restored, the roads stop looping and the residents can leave Greywood."),
+            Question(4, "What remains your responsibility after the bell is restored?", "I must be honest about the missed inspection and the lie. The records should be preserved so the town can understand what happened."),
+            Question(5, "Why did the roads begin looping?", "The relay and the silent bell allowed the Echo threat to spread. Restoring the counter-tone and shutting down the relay should end it."),
+            Question(6, "What lesson should Greywood take from this case?", "Hidden records and fear made the investigation harder. The town needs to share warnings and evidence instead of concealing them.")),
+        (3 to 5) to listOf(
+            Question(1, "Why should we believe your explanation?", "The key record and relay log show my actions. I removed the clapper because I believed the Echo's promise about Lila."),
+            Question(2, "Did you mean to make Aarav disappear?", "No. I wanted to hear Lila again. I never intended for the Echo to lure Aarav into the tunnels."),
+            Question(3, "What should happen to the relay now?", "Ring the restored bell in the 2-1-2 pattern and switch off the transmitter during the quiet interval."),
+            Question(4, "Do you accept what the evidence says?", "Yes. The key record and relay log support my actions, and I removed the clapper because I believed the Echo’s promise about Lila."),
+            Question(5, "What do you regret most?", "I let my grief make me trust a voice without checking the evidence, and my choice put Aarav and the town in danger."),
+            Question(6, "What should happen after the relay is shut down?", "The town should preserve the logs, explain the truth about Lila and make sure the bell is maintained and its records are shared.")),
+        (4 to 5) to listOf(
+            Question(1, "Was the map evidence of the sabotage?", "No. It explains a route out of Greywood. The restricted key, missing clapper and relay log identify the sabotage."),
+            Question(2, "Why did you hide the map?", "I wanted to escape a town where every road loops back. I was selfish about the map, but I did not silence the bell."),
+            Question(3, "What will you do now that the roads are clear?", "I will leave Greywood if I can. The map was always about finding a way out, not hurting Aarav."),
+            Question(4, "What does the map clear you of, and what does it not?", "It explains my attempt to find an escape route. It does not identify the saboteur; the key record and relay log address that."),
+            Question(5, "Will you share the original map now?", "Yes. Keeping it secret only made me look more suspicious. The town should have the route documented safely."),
+            Question(6, "What evidence completes the timeline?", "The map explains access routes, the key register records access at 11:32 PM, and the relay log records activation at 11:44 PM before the bell fell silent."))
     )
 
     private val levels = listOf(
@@ -311,27 +463,34 @@ class FakeEngine : GameEngine {
     override fun getSuspectDetail(suspectId: Int): String {
         val s = suspects.firstOrNull { it.id == suspectId }
             ?: return obj("id" to suspectId, "name" to "Unknown suspect", "questions" to JSONArray()).toString()
+        val questionsForLevel = levelQuestions[Pair(s.id, activeLevelId)].orEmpty()
         val qs = JSONArray()
-        for (q in s.questions) qs.put(obj("id" to q.id, "text" to q.text, "asked" to asked.contains(Pair(s.id, q.id))))
-        val count = asked.count { it.first == s.id }
+        for (q in questionsForLevel) {
+            qs.put(obj("id" to q.id, "text" to q.text,
+                "asked" to asked.contains(Triple(activeLevelId, s.id, q.id))))
+        }
+        val count = asked.count { it.first == activeLevelId && it.second == s.id }
         return obj("id" to s.id, "name" to s.name, "role" to s.role, "statement" to s.statement,
             "alibi" to s.alibi, "motive" to s.motive, "questions" to qs,
             "questionsAsked" to count, "questionsAllowed" to 3, "questionsRemaining" to (3 - count),
-            "questionNotice" to "You can ask only 3 questions per suspect across this chapter. Choose wisely!").toString()
+            "questionNotice" to "GAME TIP: You can ask only 3 questions per suspect in this level. Choose wisely!",
+            "level" to activeLevelId, "levelTitle" to active().title).toString()
     }
 
     override fun askQuestion(suspectId: Int, questionId: Int): String {
         val s = suspects.firstOrNull { it.id == suspectId }
             ?: return obj("success" to false, "suspect" to "Unknown suspect", "answer" to "This suspect could not be found.", "message" to "This suspect could not be found.").toString()
-        val q = s.questions.firstOrNull { it.id == questionId }
-            ?: return obj("success" to false, "suspect" to s.name, "answer" to "This question could not be found.", "message" to "This question could not be found.").toString()
-        val key = Pair(s.id, q.id)
-        val count = asked.count { it.first == s.id }
+        val q = levelQuestions[Pair(s.id, activeLevelId)]?.firstOrNull { it.id == questionId }
+            ?: return obj("success" to false, "suspect" to s.name, "answer" to "This question is not available for this suspect in the current level.", "message" to "This question is not available for this suspect in the current level.").toString()
+        val key = Triple(activeLevelId, s.id, q.id)
+        val count = asked.count { it.first == activeLevelId && it.second == s.id }
         if (caseFinished) return obj("success" to false, "suspect" to s.name, "answer" to "The chapter has already been concluded.", "message" to "The chapter has already been concluded.", "asked" to count, "remaining" to (3 - count)).toString()
-        if (key in asked) return obj("success" to false, "suspect" to s.name, "answer" to "You've already asked this question. Choose a different one.", "message" to "You've already asked this question. Choose a different one.", "asked" to count, "remaining" to (3 - count)).toString()
-        if (count >= 3) return obj("success" to false, "suspect" to s.name, "answer" to "You've asked all 3 questions for ${s.name} across this chapter.", "message" to "You've asked all 3 questions for ${s.name} across this chapter.", "limitReached" to true, "limit" to 3, "asked" to count, "remaining" to 0).toString()
+        if (key in asked) return obj("success" to false, "suspect" to s.name, "answer" to "You've already asked this question in this level. Choose a different one.", "message" to "You've already asked this question in this level. Choose a different one.", "asked" to count, "remaining" to (3 - count)).toString()
+        if (count >= 3) return obj("success" to false, "suspect" to s.name, "answer" to "You've used all 3 questions allowed for this suspect in this level.", "message" to "GAME TIP: You've used all 3 questions allowed for this suspect in this level.", "limitReached" to true, "limit" to 3, "asked" to count, "remaining" to 0).toString()
         asked.add(key)
-        return obj("success" to true, "suspect" to s.name, "answer" to q.answer, "asked" to count + 1, "remaining" to (2 - count), "limitReached" to false).toString()
+        return obj("success" to true, "suspect" to s.name, "answer" to q.answer,
+            "asked" to count + 1, "remaining" to (2 - count), "limitReached" to false,
+            "level" to activeLevelId, "levelTitle" to active().title).toString()
     }
 
     override fun getJournal(): String {
@@ -341,9 +500,11 @@ class FakeEngine : GameEngine {
             evidence.put(obj("id" to c.id, "name" to c.name, "description" to c.description, "location" to (loc?.name ?: "Unknown"), "level" to levels.first { level -> level.clues.any { it.id == c.id } }.title))
         }
         val testimony = JSONArray()
-        for ((sid, qid) in asked) {
-            val s = suspects.first { it.id == sid }; val q = s.questions.first { it.id == qid }
-            testimony.put(obj("suspect" to s.name, "question" to q.text, "answer" to q.answer))
+        for ((levelId, sid, qid) in asked) {
+            val s = suspects.first { it.id == sid }
+            val q = levelQuestions[Pair(sid, levelId)]!!.first { it.id == qid }
+            testimony.put(obj("suspect" to s.name, "question" to q.text, "answer" to q.answer,
+                "level" to levelId, "levelTitle" to levels.first { it.id == levelId }.title))
         }
         return obj("clues" to evidence, "testimony" to testimony).toString()
     }
