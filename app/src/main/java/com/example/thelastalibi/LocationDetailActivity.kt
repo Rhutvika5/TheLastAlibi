@@ -1,37 +1,90 @@
 package com.example.thelastalibi
 
+
+import android.app.AlertDialog
 import org.json.JSONObject
 
-/** Screen 4b: location details and clue collection. */
+/** Screen 4b: location details and optional clue saving. */
 class LocationDetailActivity : BaseScreen() {
 
     override fun render() {
-        val id = intent.getIntExtra("locationId", -1)
-        val loc = JSONObject(Game.engine.getLocationDetail(id))
-        setScreenTitle(loc.getString("name"), "Search the scene")
+        val locationId = intent.getIntExtra("locationId", -1)
 
-        addText(loc.getString("description"))
-        addText("Things worth examining:", 16f, color(R.color.alibi_accent), true, 20)
+        val location = JSONObject(
+            Game.engine.getLocationDetail(locationId)
+        )
 
-        val clues = loc.getJSONArray("clues")
+        setScreenTitle(
+            location.getString("name"),
+            "Search the scene"
+        )
+
+        addText(location.getString("description"))
+
+        addText(
+            "Things worth examining:",
+            16f,
+            color(R.color.alibi_accent),
+            true,
+            20
+        )
+
+        val clues = location.getJSONArray("clues")
+
         for (i in 0 until clues.length()) {
-            val c = clues.getJSONObject(i)
-            val clueId = c.getInt("id")
-            val spot = c.getString("spot")
-            if (c.getBoolean("collected")) {
-                addButton("✔ $spot (collected)", false) { }
+            val clue = clues.getJSONObject(i)
+
+            val clueId = clue.getInt("id")
+            val spot = clue.getString("spot")
+            val isCollected = clue.optBoolean("collected", false)
+
+            if (isCollected) {
+                addButton("✔ $spot (saved)", false) {}
             } else {
                 addButton("Examine: $spot") {
-                    val clueName = c.optString("name", spot)
-                    val clueDescription = c.optString("description", "Examine this evidence carefully.")
-                    android.app.AlertDialog.Builder(this)
+
+                    val clueName = clue.optString("name", spot)
+
+                    val description = clue.optString(
+                        "description",
+                        "Examine this evidence carefully."
+                    )
+
+                    AlertDialog.Builder(this)
                         .setTitle(clueName)
-                        .setMessage(clueDescription + "\n\nWould you like to keep this evidence in your Evidence Journal?")
+                        .setMessage(
+                            "$description\n\n" +
+                                    "Would you like to save this evidence " +
+                                    "in your Evidence Journal?"
+                        )
                         .setPositiveButton("Save to Journal") { _, _ ->
-                            val r = JSONObject(Game.engine.collectClue(id, clueId))
-                            showMessage(r.getString("title"), r.getString("message")) { refresh() }
+
+                            val result = JSONObject(
+                                Game.engine.collectClue(
+                                    locationId,
+                                    clueId
+                                )
+                            )
+
+                            AlertDialog.Builder(this)
+                                .setTitle(
+                                    result.optString(
+                                        "title",
+                                        "Evidence"
+                                    )
+                                )
+                                .setMessage(
+                                    result.optString(
+                                        "message",
+                                        "Your choice has been recorded."
+                                    )
+                                )
+                                .setPositiveButton("OK") { _, _ ->
+                                    refresh()
+                                }
+                                .show()
                         }
-                        .setNegativeButton("Leave it") { _, _ -> }
+                        .setNegativeButton("Leave it", null)
                         .show()
                 }
             }

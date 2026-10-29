@@ -7,6 +7,12 @@
         android:label="The Last Alibi">
 
         <activity
+            android:name=".BellPuzzleActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"

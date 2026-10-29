@@ -3,10 +3,7 @@ package com.example.thelastalibi
 import org.json.JSONArray
 import org.json.JSONObject
 
-/**
- * Demo engine for Chapter 1: Welcome to Greywood.
- * Five playable levels follow the supplied story PDF. UI files are intentionally untouched.
- */
+
 class FakeEngine : GameEngine {
     private data class Location(val id: Int, val name: String, val description: String)
     private data class Clue(val id: Int, val locationId: Int, val spot: String, val name: String, val description: String, val key: Boolean)
@@ -210,9 +207,18 @@ class FakeEngine : GameEngine {
             Question(4, "What does the map clear you of, and what does it not?", "It explains my attempt to find an escape route. It does not identify the saboteur; the key record and relay log address that."),
             Question(5, "Will you share the original map now?", "Yes. Keeping it secret only made me look more suspicious. The town should have the route documented safely."),
             Question(6, "What evidence completes the timeline?", "The map explains access routes, the key register records access at 11:32 PM, and the relay log records activation at 11:44 PM before the bell fell silent."))
-    )
+    ).let { allQuestions ->
+        // The chapter has one playable level, so each suspect receives six
+        // distinct questions drawn from the five narrative stages.
+        (1..4).associate { suspectId ->
+            (suspectId to 1) to (1..5)
+                .flatMap { stageId -> allQuestions[Pair(suspectId, stageId)].orEmpty() }
+                .distinctBy { it.text }
+                .take(6)
+        }
+    }
 
-    private val levels = listOf(
+    private val storyLevels = listOf(
         Level(1, "The Missing Resident", "The locked room and the first clues",
             "At sunrise, Aarav is missing from a room locked from the inside. The door is untouched, the window is latched, and Greywood's warning bell stopped at 11:47 PM. Find out how he could have left.",
             listOf(
@@ -302,7 +308,7 @@ class FakeEngine : GameEngine {
                 Clue(26, 13, "Shutdown instructions", "The 2-1-2 Pattern", "At dawn, ring the bell twice, once, then twice. During the brief quiet interval, switch off the relay.", true)
             ), "Find Aarav's recorder and the transmitter log. Rowan's notebook explains why the bell must be restored before the relay is shut down."),
         Level(5, "The Last Bell", "The accusation and the final ring",
-            "At dawn, confront Dev with the evidence. Then restore the clapper, ring the bell in the 2-1-2 pattern and switch off the transmitter during the quiet interval.",
+            "The first light of dawn reaches the bell tower. The town waits in uneasy silence as the investigation reaches its final moments.",
             listOf(
                 "At dawn, the player confronts Dev in the relay chamber. The repeated static matches the signal found in the radio shack. The service-key record, missing clapper and relay log place Dev at the centre of the events.",
                 "An Echo imitated Lila's voice and promised Dev he could reach his missing sister if he silenced the warning bell. Grief made him believe the promise. He removed the clapper and activated the relay, hoping to hear Lila again. He did not intend to make Aarav disappear.",
@@ -324,11 +330,37 @@ class FakeEngine : GameEngine {
             ), "Compare Dev's key record with the clapper and relay log. Then follow Rowan's instructions: ring 2-1-2 and shut down the relay during the quiet interval.")
     )
 
+    // The five narrative stages are presented as ONE playable chapter/level.
+    // Preserve all story pages, locations and clues, while making location IDs unique.
+    private val levels = listOf(
+        Level(
+            1,
+            "The Last Alibi",
+            "One investigation. One missing resident. A town trapped by voices in the dark.",
+            "Greywood is cut off from the world. After dark, its roads bend back toward the same streets, no matter which direction a traveler takes. The townspeople fear strange Echoes that imitate familiar voices.\n\nAt sunrise, Aarav is missing from a room locked from the inside. The warning bell has fallen silent, and old records hint at secrets the town has tried to bury. Search Greywood, listen carefully, and decide what the evidence means.",
+            listOf(
+                "Greywood is cut off from the rest of the world. After dark, its roads bend back toward the same streets, no matter which direction a traveler takes.",
+                "The townspeople fear the Echoes: strange presences that imitate familiar voices. A bronze warning bell rings every night, sending a counter-tone that keeps the Echoes away from homes.",
+                "At sunrise, Aarav is missing from a room locked from the inside. The door is untouched, the window is still latched, and the bell fell silent during the night.",
+                "Aarav's disappearance has reopened old questions about the town, its abandoned station, and a resident who vanished years ago.",
+                "The town is full of secrets, and every witness remembers the night differently. The investigation begins at first light."
+            ),
+            storyLevels.flatMapIndexed { index, level ->
+                level.locations.map { loc -> loc.copy(id = (index + 1) * 100 + loc.id) }
+            },
+            storyLevels.flatMapIndexed { index, level ->
+                level.clues.map { clue -> clue.copy(locationId = (index + 1) * 100 + clue.locationId) }
+            },
+            "Explore the locations, compare what witnesses say with the evidence, and keep track of details that seem connected."
+        )
+    )
+
     private val accusationOptions = listOf(
         Option(1, "Accuse Dr. Mira, the town doctor."),
         Option(2, "Accuse Joseph, the bell caretaker."),
         Option(3, "Accuse Dev, the radio operator."),
-        Option(4, "Accuse Noah, the recent arrival.")
+        Option(4, "Accuse Noah, the recent arrival."),
+        Option(5, "Do not formally accuse Dev; the evidence is not enough.")
     )
     private val actualCulpritId = 3
 
@@ -385,7 +417,7 @@ class FakeEngine : GameEngine {
         for (l in levels) arr.put(obj(
             "id" to l.id, "chapter" to chapterNumber, "chapterTitle" to chapterTitle,
             "title" to l.title, "subtitle" to l.subtitle, "locked" to (l.id !in unlockedLevels),
-            "completed" to (l.id < levels.size && (l.id + 1) in unlockedLevels || (l.id == 5 && caseFinished))
+            "completed" to (l.id == 1 && caseFinished)
         ))
         return arr.toString()
     }
@@ -406,12 +438,12 @@ class FakeEngine : GameEngine {
             "level" to l.id,
             "levelTitle" to l.title,
             "subtitle" to l.subtitle,
-            "finalLabel" to if (l.id == 5) "Accuse the Suspect" else "Investigation Notes",
-            "question" to if (l.id == 5) "Who caused the breach that let the Echoes reach Greywood?" else "What does the evidence reveal?",
+            "finalLabel" to "Accuse the Suspect",
+            "question" to "Who caused the breach that let the Echoes reach Greywood?",
             "storyPages" to JSONArray(l.story),
             "intro" to l.intro,
             "levelHint" to l.hint,
-            "chapterLevelCount" to levels.size
+            "chapterLevelCount" to 1
         ).toString()
     }
 
@@ -447,8 +479,8 @@ class FakeEngine : GameEngine {
             ?: return obj("success" to false, "title" to "Nothing here", "message" to "There is nothing to find in this location for the current level.").toString()
         if (c.id in collected) return obj("success" to false, "title" to "Already collected", "message" to "You already have: ${c.name}.").toString()
         collected.add(c.id)
-        maybeUnlockNext()
-        val nextUnlocked = activeLevelId < levels.size && activeLevelId + 1 in unlockedLevels
+        // All evidence belongs to the single chapter; collecting a clue never unlocks another level.
+        val nextUnlocked = false
         return obj("success" to true, "title" to "Evidence found: ${c.name}", "message" to c.description,
             "nextLevelUnlocked" to nextUnlocked, "nextLevel" to if (nextUnlocked) activeLevelId + 1 else JSONObject.NULL,
             "cluesFound" to active().clues.count { it.id in collected }, "cluesTotal" to active().clues.size).toString()
@@ -511,82 +543,70 @@ class FakeEngine : GameEngine {
 
     override fun getHint(): String {
         if (caseFinished) return obj("hint" to "Chapter 1 has been concluded.", "used" to hintsUsed, "remaining" to (2 - hintsUsed), "available" to false).toString()
-        if (hintsUsed >= 2) return obj("hint" to "You've used both hints for this level. Trust your evidence.", "used" to hintsUsed, "remaining" to 0, "available" to false).toString()
+        if (hintsUsed >= 2) return obj("hint" to "You've used both hints for this chapter. Trust your evidence.", "used" to hintsUsed, "remaining" to 0, "available" to false).toString()
         hintsUsed++
         val l = active()
-        val objectiveIds = when (l.id) {
-            1 -> listOf(4, 8)
-            2 -> listOf(10, 13)
-            3 -> listOf(16, 20)
-            4 -> listOf(24, 26)
-            else -> emptyList()
-        }
-        val missingObjective = l.clues.firstOrNull { it.id in objectiveIds && it.id !in collected }
         val uncollected = l.clues.firstOrNull { it.id !in collected }
         val hint = when {
-            missingObjective != null -> "${l.hint} To unlock the next level, find this key evidence: ${missingObjective.name} at ${missingObjective.spot}."
-            l.id < 5 && levelObjectiveComplete(l.id) -> "You've found the key evidence. Return to the level list and open Level ${l.id + 1}."
-            uncollected != null -> "${l.hint} First, inspect: ${uncollected.spot}."
-            l.id < 5 -> "You've gathered the clues, but check the key evidence listed in your journal to unlock Level ${l.id + 1}."
-            else -> "Use the restricted-key record, missing clapper and relay log. Dev caused the breach; Noah's map explains the route, not the sabotage."
+            uncollected != null -> "Look closely at the locations and compare details from different parts of Greywood. One useful place to start is: ${uncollected.spot}."
+            else -> "Review the clues and testimony you chose to keep. Look for details that agree, and for anything that conflicts with a suspect's account."
         }
         return obj("hint" to hint, "used" to hintsUsed, "remaining" to (2 - hintsUsed), "available" to (hintsUsed < 2)).toString()
     }
 
     override fun getAccusationOptions(): String {
         val arr = JSONArray()
-        val options = when (activeLevelId) {
-            1 -> listOf(Option(1, "Blame Noah for taking Aarav"), Option(2, "Follow the hatch route to the radio shack"), Option(3, "Assume Aarav left through the locked door"))
-            2 -> listOf(Option(1, "The voice is a repeating Echo signal linked to the old relay"), Option(2, "Lila is calling live from the radio"), Option(3, "The static proves Noah silenced the bell"))
-            3 -> listOf(Option(1, "Joseph removed the clapper because he missed inspection"), Option(2, "The clapper fell off by itself"), Option(3, "The missing clapper and Dev's restricted-key record point to sabotage by Dev"))
-            4 -> listOf(Option(1, "Keep the bell silent and follow the voice"), Option(2, "Ring the bell in a 2-1-2 pattern, then shut down the relay during the quiet interval"), Option(3, "Switch off the relay before restoring the bell"))
-            else -> accusationOptions
-        }
+        val options = accusationOptions
         for (o in options) arr.put(obj("id" to o.id, "text" to o.text))
         return arr.toString()
     }
 
     override fun accuse(optionId: Int): String {
-        if (activeLevelId != 5) {
-            val correctOption = when (activeLevelId) { 1 -> 2; 2 -> 1; 3 -> 3; 4 -> 2; else -> -1 }
-            val next = activeLevelId + 1
-            if (optionId !in 1..3) return obj("outcome" to "INVALID", "title" to "Choose a deduction", "label" to "No deduction selected", "message" to "Choose one of the investigation theories.", "cluesFound" to collected.size, "cluesTotal" to levels.sumOf { it.clues.size }, "caseFinished" to false).toString()
-            if (!requiredCluesFound(activeLevelId)) {
-                val missing = when (activeLevelId) {
-                    1 -> listOf(4 to "Unsent Message", 8 to "Old Service Map")
-                    2 -> listOf(10 to "Lila's Voice", 13 to "Lila's Missing-Person File")
-                    3 -> listOf(16 to "Missing Clapper", 20 to "Dev's Restricted-Key Record")
-                    else -> listOf(24 to "Relay Activation at 11:44", 26 to "The 2-1-2 Pattern")
-                }.filter { it.first !in collected }.joinToString(" and ") { it.second }
-                return obj("outcome" to "INSUFFICIENT", "title" to "More evidence needed", "label" to "Deduction not available yet",
-                    "message" to "Investigate the required evidence first: $missing. Finding every clue is not necessary—only the key evidence matters.",
-                    "cluesFound" to collected.size, "cluesTotal" to levels.sumOf { it.clues.size }, "caseFinished" to false).toString()
-            }
-            if (optionId != correctOption) return obj("outcome" to "FALSE", "title" to "Deduction rejected", "label" to "That theory does not fit the evidence",
-                "message" to "Not quite. Re-read the key evidence and try a different deduction. You have not lost your progress.",
-                "cluesFound" to collected.size, "cluesTotal" to levels.sumOf { it.clues.size }, "caseFinished" to false).toString()
-            solvedDeductions.add(activeLevelId)
-            maybeUnlockNext()
-            val unlocked = next in unlockedLevels
-            return obj("outcome" to "CONTINUE", "title" to "Deduction accepted!", "label" to "Level ${activeLevelId} solved",
-                "message" to "Correct deduction. The evidence supports this conclusion, and Level $next is now unlocked. Return to Choose a Case to continue.",
-                "cluesFound" to collected.size, "cluesTotal" to levels.sumOf { it.clues.size },
-                "caseFinished" to false, "nextLevelUnlocked" to unlocked, "nextLevel" to if (unlocked) next else JSONObject.NULL).toString()
-        }
         val selected = accusationOptions.firstOrNull { it.id == optionId }
-            ?: return obj("outcome" to "INVALID", "title" to "Choose a suspect", "label" to "No accusation selected", "message" to "Choose one of the four suspects.", "cluesFound" to collected.size, "cluesTotal" to levels.sumOf { it.clues.size }, "caseFinished" to false).toString()
-        val correct = optionId == actualCulpritId
+            ?: return obj("outcome" to "INVALID", "title" to "Choose your decision", "label" to "No decision selected", "message" to "Choose whether to accuse a suspect or withhold a formal accusation.", "cluesFound" to collected.size, "cluesTotal" to levels.sumOf { it.clues.size }, "caseFinished" to false).toString()
+
+        // The bell solution and the accusation are separate decisions. The rescue
+        // succeeds only if the player found all three final bell/relay clues.
+        val aaravSaved = collected.containsAll(setOf(29, 30, 31))
+        val accusedDev = optionId == 3
+        val formalNoAccusation = optionId == 5
+        val correct = accusedDev
         caseFinished = true
         val found = collected.size
         val total = levels.sumOf { it.clues.size }
-        val truth = "Dev caused the breach, though he did not intend to make Aarav disappear. An Echo imitated Lila's voice and promised Dev he could reach his missing sister if he silenced the warning bell. Grief made him believe it. He removed the clapper and activated the old relay, hoping to hear Lila again. Once the bell's protection failed, an Echo used Lila's copied voice to lure Aarav through the maintenance hatch and into the tunnels. Mira hid old reports because she feared panic. Joseph hid his missed inspection because he feared blame. Noah kept the station map because he wanted to escape a town whose roads never led away. The service-key record, missing clapper and relay log point to Dev."
-        val ending = "$truth\n\nAt dawn, restore the clapper and ring the bell in a 2-1-2 pattern: two strikes, one strike, then two more. During the brief quiet interval, switch off the transmitter. The repeating signal dies, the Echoes fade, and Greywood's roads finally lead beyond the town. Aarav is safe. End of Chapter 1."
-        val selectedText = selected.text.removePrefix("Accuse ").removeSuffix(".")
-        val message = if (correct) "You accused $selectedText. The evidence supports your conclusion.\n\n$ending" else "You accused $selectedText, but the evidence points to Dev, the radio operator.\n\n$ending"
-        return obj("outcome" to if (correct) "PROVED" else "FALSE", "title" to if (correct) "Chapter Complete!" else "Wrong Suspect",
-            "label" to if (correct) "You identified who caused the breach" else "The evidence points to Dev",
-            "message" to message, "correct" to correct, "selectedOptionId" to selected.id, "correctOptionId" to actualCulpritId,
-            "accusedSuspect" to selected.text, "actualCulprit" to "Dev", "cluesFound" to found, "cluesTotal" to total,
-            "caseFinished" to true, "chapterFinished" to true).toString()
+
+        val truth = "Dev removed the bell's clapper and activated the old relay after an Echo imitated Lila's voice and promised he could reach his missing sister. He acted out of grief and desperation; he did not intend to make Aarav disappear. With the bell's protection gone, an Echo used Lila's copied voice to lure Aarav through the maintenance hatch and into the tunnels. Mira hid old reports because she feared panic. Joseph concealed his missed inspection because he feared blame. Noah kept the station map because he wanted to escape Greywood. The service-key record, missing clapper and relay log reveal Dev's role—but the evidence also shows that his intention was not to abduct Aarav."
+        val rescueText = if (aaravSaved) {
+            "The clapper is restored and the 2-1-2 bell pattern creates the brief quiet interval. The transmitter is shut down in time. The repeating signal dies, the Echoes fade, and Aarav is brought back safely."
+        } else {
+            "The correct bell sequence was not completed with all the necessary evidence. The transmitter keeps repeating, and Aarav's fate remains uncertain in the tunnels. The case ends with an unresolved rescue."
+        }
+        val decisionText = when {
+            accusedDev -> "You formally accuse Dev. The evidence supports that he removed the clapper and activated the relay, even though he did not intend Aarav's disappearance."
+            formalNoAccusation -> "You choose not to formally accuse Dev. You recognise his role in the bell's failure, but decide the evidence and his lack of intent do not justify a formal accusation at this time."
+            else -> "You accuse ${selected.text.removePrefix("Accuse ").removeSuffix(".")}, but the strongest evidence points to Dev's actions at the bell and relay."
+        }
+        val message = "$decisionText\n\n$truth\n\n$rescueText\n\nEnd of Chapter 1."
+        val title = when {
+            !aaravSaved -> "An Unresolved Dawn"
+            accusedDev -> "Aarav Saved — Dev Accused"
+            formalNoAccusation -> "MYSTERY SOLVED"
+            else -> "Aarav Saved — Wrong Accusation"
+        }
+        val label = when {
+            !aaravSaved -> "The rescue remains unresolved"
+            accusedDev -> "You saved Aarav and accused Dev"
+            formalNoAccusation -> "Mystery solved — you chose not to formally accuse Dev"
+            else -> "The evidence does not support this accusation"
+        }
+        return obj(
+            "outcome" to when { formalNoAccusation && aaravSaved -> "INSUFFICIENT"; accusedDev -> "PROVED"; else -> "FALSE" },
+            "title" to title, "label" to label, "message" to message,
+            "correct" to correct, "selectedOptionId" to selected.id, "correctOptionId" to 3,
+            "accusedSuspect" to selected.text, "actualCulprit" to "Dev",
+            "aaravSaved" to aaravSaved, "devAccused" to accusedDev,
+            "cluesFound" to found, "cluesTotal" to total,
+            "caseFinished" to true, "chapterFinished" to true
+        ).toString()
     }
 }

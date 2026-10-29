@@ -7,7 +7,7 @@ class NativeEngine : GameEngine {
     override fun getCaseInfo() = NativeBridge.getCaseInfo()
     override fun getLocations() = NativeBridge.getLocations()
     override fun getLocationDetail(locationId: Int) = NativeBridge.getLocationDetail(locationId)
-    override fun collectClue(locationId: Int, clueId: Int) = NativeBridge.collectClue(locationId, clueId)
+    override fun collectClue(locationId: Int,    clueId: Int) = NativeBridge.collectClue(locationId, clueId)
     override fun getSuspects() = NativeBridge.getSuspects()
     override fun getSuspectDetail(suspectId: Int) = NativeBridge.getSuspectDetail(suspectId)
     override fun askQuestion(suspectId: Int, questionId: Int) = NativeBridge.askQuestion(suspectId, questionId)

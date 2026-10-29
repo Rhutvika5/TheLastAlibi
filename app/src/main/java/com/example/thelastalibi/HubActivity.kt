@@ -18,9 +18,11 @@ class HubActivity : BaseScreen() {
             val hint = JSONObject(Game.engine.getHint()).getString("hint")
             showMessage("Hint", hint)
         }
-        // Label comes from the engine (e.g. "Draw Your Conclusion" or "Make Accusation")
-        addButton(info.optString("finalLabel", "Make Accusation")) {
-            startActivity(Intent(this, AccusationActivity::class.java))
+
+// Open the bell puzzle before the final accusation decision.
+        addButton("Save Aarav") {
+            startActivity(Intent(this, BellPuzzleActivity::class.java))
         }
+
     }
 }
