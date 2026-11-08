@@ -317,38 +317,8 @@ class LevelSelectActivity : Activity() {
 
         header.addView(caseBadge)
 
-        // Audio indicator
-        val audio = makeText(
-            "🔇",
-            17f,
-            gold
-        ).apply {
-            gravity = Gravity.CENTER
-
-            background = roundedBackground(
-                Color.rgb(35, 29, 24),
-                brown,
-                1,
-                6
-            )
-
-            setPadding(
-                dp(12),
-                dp(5),
-                dp(12),
-                dp(5)
-            )
-        }
-
-        header.addView(
-            audio,
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                dp(38)
-            ).apply {
-                marginStart = dp(10)
-            }
-        )
+        // Audio button intentionally removed.
+        // GameAudioManager provides the single global audio icon.
 
         // Main menu
         val menu = makeText(

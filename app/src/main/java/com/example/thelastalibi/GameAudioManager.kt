@@ -39,6 +39,9 @@ object GameAudioManager {
 
     private val loadedSounds = mutableSetOf<Int>()
 
+    // Activities currently in the foreground.
+    private val resumedActivities = mutableSetOf<Activity>()
+
     private val audioControls = WeakHashMap<Activity, TextView>()
     private val audioWiredViews = WeakHashMap<View, Boolean>()
     private val clickWiredViews = WeakHashMap<View, Boolean>()
@@ -56,6 +59,7 @@ object GameAudioManager {
                 savedInstanceState: Bundle?
             ) {
                 activity.window.decorView.post {
+
                     configureActivity(activity)
 
                     if (activity !is MainActivity) {
@@ -65,13 +69,33 @@ object GameAudioManager {
             }
 
             override fun onActivityResumed(activity: Activity) {
+
+                // App is now in the foreground.
+                resumedActivities.add(activity)
+
+                if (audioEnabled) {
+                    soundPool?.autoResume()
+                    startMusic()
+                }
+
                 activity.window.decorView.post {
                     configureActivity(activity)
                 }
             }
 
+            override fun onActivityPaused(activity: Activity) {
+
+                resumedActivities.remove(activity)
+
+                // Stop all audio when no Activity remains resumed.
+                if (resumedActivities.isEmpty()) {
+                    pauseMusic()
+                    soundPool?.autoPause()
+                }
+            }
+
             override fun onActivityStarted(activity: Activity) {}
-            override fun onActivityPaused(activity: Activity) {}
+
             override fun onActivityStopped(activity: Activity) {}
 
             override fun onActivitySaveInstanceState(
@@ -80,8 +104,16 @@ object GameAudioManager {
             ) {}
 
             override fun onActivityDestroyed(activity: Activity) {
+
+                resumedActivities.remove(activity)
+
                 audioControls.remove(activity)
                 audioListeners.remove(activity)
+
+                if (resumedActivities.isEmpty()) {
+                    pauseMusic()
+                    soundPool?.autoPause()
+                }
             }
         }
 
@@ -99,7 +131,10 @@ object GameAudioManager {
             appContext = application
 
             audioEnabled = application
-                .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                .getSharedPreferences(
+                    PREFS,
+                    Context.MODE_PRIVATE
+                )
                 .getBoolean(KEY_ENABLED, true)
 
             val attributes = AudioAttributes.Builder()
@@ -154,9 +189,22 @@ object GameAudioManager {
             callbacksRegistered = true
         }
 
-        if (audioEnabled) {
+        // Never start music just because initialize() was called.
+        // It must also have a resumed Activity.
+        if (audioEnabled && resumedActivities.isNotEmpty()) {
             startMusic()
+        } else {
+            pauseMusic()
+            soundPool?.autoPause()
         }
+    }
+
+    // ---------------------------------------------------------
+    // FOREGROUND STATE
+    // ---------------------------------------------------------
+
+    private fun isAppInForeground(): Boolean {
+        return resumedActivities.isNotEmpty()
     }
 
     // ---------------------------------------------------------
@@ -193,9 +241,17 @@ object GameAudioManager {
         )?.apply()
 
         if (enabled) {
-            soundPool?.autoResume()
-            startMusic()
+
+            if (isAppInForeground()) {
+                soundPool?.autoResume()
+                startMusic()
+            } else {
+                pauseMusic()
+                soundPool?.autoPause()
+            }
+
         } else {
+
             pauseMusic()
             soundPool?.autoPause()
         }
@@ -222,12 +278,15 @@ object GameAudioManager {
     }
 
     // ---------------------------------------------------------
-    // HORROR BACKGROUND MUSIC
+    // BACKGROUND MUSIC
     // ---------------------------------------------------------
 
     private fun startMusic() {
 
         if (!audioEnabled) return
+
+        // Do not play music while the app is in the background.
+        if (!isAppInForeground()) return
 
         val context = appContext ?: return
 
@@ -242,7 +301,6 @@ object GameAudioManager {
 
                     isLooping = true
 
-                    // Moderately high background volume: 72%
                     setVolume(0.72f, 0.72f)
 
                     setOnErrorListener { player, _, _ ->
@@ -301,7 +359,10 @@ object GameAudioManager {
         volume: Float
     ) {
 
-        if (!audioEnabled || soundId == 0) return
+        // Sound effects are also restricted to foreground use.
+        if (!audioEnabled || !isAppInForeground()) return
+
+        if (soundId == 0) return
 
         val ready = synchronized(loadedSounds) {
             loadedSounds.contains(soundId)
@@ -337,33 +398,66 @@ object GameAudioManager {
             android.R.id.content
         ) ?: return
 
-        var audioButton: TextView? =
-            activity.findViewById(R.id.audioButton)
+        // Prefer an audio button already declared in XML.
+        val xmlAudioButton = activity.findViewById<TextView>(
+            R.id.audioButton
+        )
 
-        if (audioButton == null) {
+        val button: TextView
 
-            audioButton = audioControls[activity]
+        if (xmlAudioButton != null) {
 
-            if (audioButton == null) {
+            removeInjectedAudioButtons(
+                content,
+                xmlAudioButton
+            )
 
-                audioButton = createAudioButton(activity)
+            val previousButton = audioControls[activity]
+
+            if (
+                previousButton != null &&
+                previousButton !== xmlAudioButton &&
+                previousButton.parent != null
+            ) {
+                (previousButton.parent as? ViewGroup)
+                    ?.removeView(previousButton)
+            }
+
+            button = xmlAudioButton
+
+        } else {
+
+            val existingButton = audioControls[activity]
+                ?.takeIf { it.parent != null }
+
+            if (existingButton != null) {
+
+                button = existingButton
+
+            } else {
+
+                button = createAudioButton(activity)
 
                 val menu = findMenuButton(content)
                 val parent = menu?.parent
 
-                if (menu != null && parent is LinearLayout) {
+                if (
+                    menu != null &&
+                    parent is LinearLayout &&
+                    parent.orientation == LinearLayout.HORIZONTAL
+                ) {
 
                     val index = parent.indexOfChild(menu)
 
                     val params = LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        dp(activity, 38)
+                        dp(activity, 38),
+                        dp(activity, 34)
                     ).apply {
-                        marginStart = dp(activity, 10)
+                        marginStart = dp(activity, 6)
                     }
 
                     parent.addView(
-                        audioButton,
+                        button,
                         index,
                         params
                     )
@@ -371,20 +465,19 @@ object GameAudioManager {
                 } else {
 
                     val params = FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
                         dp(activity, 38),
+                        dp(activity, 34),
                         Gravity.TOP or Gravity.END
                     ).apply {
-                        topMargin = dp(activity, 10)
-                        marginEnd = dp(activity, 18)
+
+                        topMargin = dp(activity, 2)
+                        marginEnd = dp(activity, 5)
                     }
 
-                    content.addView(audioButton, params)
+                    content.addView(button, params)
                 }
             }
         }
-
-        val button = audioButton ?: return
 
         audioControls[activity] = button
 
@@ -407,7 +500,37 @@ object GameAudioManager {
     }
 
     // ---------------------------------------------------------
-    // FIND MAIN MENU BUTTON
+    // REMOVE DUPLICATE INJECTED AUDIO CONTROLS
+    // ---------------------------------------------------------
+
+    private fun removeInjectedAudioButtons(
+        view: View,
+        keepButton: View
+    ) {
+
+        if (
+            view !== keepButton &&
+            view.tag == OVERLAY_TAG
+        ) {
+
+            (view.parent as? ViewGroup)?.removeView(view)
+            return
+        }
+
+        if (view is ViewGroup) {
+
+            for (i in view.childCount - 1 downTo 0) {
+
+                removeInjectedAudioButtons(
+                    view.getChildAt(i),
+                    keepButton
+                )
+            }
+        }
+    }
+
+    // ---------------------------------------------------------
+    // FIND MAIN MENU / BACK BUTTON
     // ---------------------------------------------------------
 
     private fun findMenuButton(view: View): TextView? {
@@ -443,7 +566,7 @@ object GameAudioManager {
     }
 
     // ---------------------------------------------------------
-    // CREATE AUDIO BUTTON
+    // CREATE COMPACT AUDIO ICON
     // ---------------------------------------------------------
 
     private fun createAudioButton(
@@ -453,30 +576,32 @@ object GameAudioManager {
         return TextView(activity).apply {
 
             tag = OVERLAY_TAG
-            textSize = 11f
+
+            textSize = 18f
+
             gravity = Gravity.CENTER
 
+            minimumWidth = dp(activity, 38)
+            minimumHeight = dp(activity, 34)
+
             setTextColor(
-                Color.rgb(220, 195, 155)
+                Color.rgb(236, 211, 169)
             )
 
-            setPadding(
-                dp(activity, 12),
-                dp(activity, 5),
-                dp(activity, 12),
-                dp(activity, 5)
-            )
+            setPadding(0, 0, 0, 0)
 
             background = GradientDrawable().apply {
 
-                setColor(Color.rgb(35, 29, 24))
+                setColor(
+                    Color.rgb(35, 29, 24)
+                )
 
                 setStroke(
                     dp(activity, 1),
                     Color.rgb(153, 112, 62)
                 )
 
-                cornerRadius = dp(activity, 7).toFloat()
+                cornerRadius = dp(activity, 6).toFloat()
             }
 
             isClickable = true
@@ -484,12 +609,36 @@ object GameAudioManager {
         }
     }
 
+    // ---------------------------------------------------------
+    // UPDATE AUDIO ICON ON ALL SCREENS
+    // ---------------------------------------------------------
+
     private fun updateAudioButton(button: TextView) {
 
         button.text = if (audioEnabled) {
-            "♪ AUDIO ON"
+            "🔊"
         } else {
-            "♪ AUDIO OFF"
+            "🔇"
+        }
+
+        button.textSize = 18f
+
+        button.gravity = Gravity.CENTER
+
+        button.contentDescription = if (audioEnabled) {
+            "Mute game audio"
+        } else {
+            "Enable game audio"
+        }
+
+        button.setPadding(0, 0, 0, 0)
+
+        button.layoutParams?.let { params ->
+
+            params.width = dp(button.context, 38)
+            params.height = dp(button.context, 34)
+
+            button.layoutParams = params
         }
     }
 
