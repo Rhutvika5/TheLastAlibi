@@ -1,60 +1,273 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:fitsSystemWindows="true"
-    android:background="@color/alibi_bg">
+    android:background="#0C0D10">
 
+    <!-- TOP HEADER -->
     <LinearLayout
+        android:id="@+id/topHeader"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_gravity="top"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="28dp"
+        android:paddingEnd="28dp"
+        android:background="#101114">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="●"
+            android:textColor="#C43A32"
+            android:textSize="17sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="9dp"
+            android:text="THE LAST ALIBI"
+            android:textColor="#E8D5B5"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/special_elite"
+            android:letterSpacing="0.10" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="5dp"
+            android:background="@drawable/bg_title_card"
+            android:text="CASE #409"
+            android:textColor="#C99A55"
+            android:textSize="10sp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/audioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="13dp"
+            android:paddingVertical="8dp"
+            android:background="@drawable/bg_title_secondary_button"
+            android:text="♪ AUDIO OFF"
+            android:textColor="#C9B99F"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/menuButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:paddingHorizontal="13dp"
+            android:paddingVertical="8dp"
+            android:background="@drawable/bg_title_secondary_button"
+            android:text="BACK TO CASES"
+            android:textColor="#C9B99F"
+            android:textSize="11sp" />
+
+    </LinearLayout>
+
+    <!-- MAIN CONTENT -->
+    <LinearLayout
+        android:id="@+id/prologueContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginTop="65dp"
+        android:layout_marginBottom="15dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:baselineAligned="false">
 
-        <TextView
-            android:id="@+id/introTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/alibi_accent"
-            android:textSize="26sp"
-            android:textStyle="bold" />
+        <!-- STORY PANEL: 75% WIDTH -->
+        <LinearLayout
+            android:id="@+id/storyPanel"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:orientation="vertical"
+            android:background="@drawable/bg_title_card"
+            android:padding="16dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Prologue"
-            android:textColor="@color/alibi_muted"
-            android:textSize="14sp" />
-
-        <!-- The whole story scrolls inside this window; the button stays pinned below -->
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginTop="16dp"
-            android:fadeScrollbars="false"
-            android:scrollbars="vertical">
-
+            <!-- SMALL PROLOGUE HEADING -->
             <TextView
-                android:id="@+id/storyText"
+                android:id="@+id/introTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/alibi_text"
+                android:text="PROLOGUE"
+                android:textColor="#EFAF43"
                 android:textSize="18sp"
-                android:lineSpacingExtra="6dp"
-                android:paddingEnd="8dp" />
-        </ScrollView>
+                android:textStyle="bold"
+                android:fontFamily="@font/special_elite"
+                android:letterSpacing="0.12" />
 
-        <Button
-            android:id="@+id/beginButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_button"
-            android:textAllCaps="false"
-            android:textColor="@color/alibi_bg"
-            android:text="Begin Investigation" />
+            <TextView
+                android:id="@+id/introSubtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="CONFIDENTIAL NARRATIVE / CASE #409"
+                android:textColor="#A88D68"
+                android:textSize="9sp"
+                android:letterSpacing="0.08" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="9dp"
+                android:background="#765633" />
+
+            <!-- STORY TEXT WITH DYNAMIC TYPING -->
+            <ScrollView
+                android:id="@+id/storyScroll"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:fillViewport="false"
+                android:scrollbars="none">
+
+                <TextView
+                    android:id="@+id/storyText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="#E8DCC7"
+                    android:textSize="17sp"
+                    android:fontFamily="@font/special_elite"
+                    android:lineSpacingExtra="8dp"
+                    android:letterSpacing="0.015"
+                    android:paddingBottom="12dp"
+                    android:gravity="start"
+                    android:includeFontPadding="true" />
+
+            </ScrollView>
+
+            <!-- STORY BUTTONS -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingTop="8dp">
+
+                <Button
+                    android:id="@+id/skipButton"
+                    android:layout_width="135dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/bg_title_secondary_button"
+                    android:text="SKIP TYPING"
+                    android:textColor="#D5B98C"
+                    android:textSize="10sp"
+                    android:textAllCaps="false"
+                    android:fontFamily="@font/special_elite"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/beginButton"
+                    android:layout_width="195dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/bg_button"
+                    android:text="BEGIN INVESTIGATION →"
+                    android:textColor="#17100B"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    android:fontFamily="@font/special_elite"
+                    android:enabled="false"
+                    android:alpha="0.45"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- NARRATOR PANEL: 25% WIDTH -->
+        <LinearLayout
+            android:id="@+id/narratorPanel"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="13dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/bg_title_card"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="THE STORYTELLER"
+                android:textColor="#C99A55"
+                android:textSize="10sp"
+                android:fontFamily="@font/special_elite"
+                android:letterSpacing="0.09"
+                android:gravity="center" />
+
+            <!-- DETAILED NARRATOR PORTRAIT -->
+            <ImageView
+                android:id="@+id/narratorImage"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginTop="7dp"
+                android:layout_marginBottom="5dp"
+                android:src="@drawable/ic_narrator_portrait"
+                android:scaleType="fitCenter"
+                android:contentDescription="Detective storyteller" />
+
+            <TextView
+                android:id="@+id/narratorName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="THE NARRATOR"
+                android:textColor="#E8C894"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/special_elite"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="A VOICE FROM GREYWOOD"
+                android:textColor="#A88D68"
+                android:textSize="8sp"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/narratorStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="6dp"
+                android:background="@drawable/bg_title_secondary_button"
+                android:text="● NARRATING..."
+                android:textColor="#DDA63E"
+                android:textSize="9sp"
+                android:fontFamily="@font/special_elite"
+                android:gravity="center" />
+
+        </LinearLayout>
+
     </LinearLayout>
-</LinearLayout>
+
+</FrameLayout>

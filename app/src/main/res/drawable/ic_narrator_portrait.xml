@@ -1,0 +1,125 @@
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="180dp"
+    android:height="240dp"
+    android:viewportWidth="180"
+    android:viewportHeight="240">
+
+    <!-- Portrait background -->
+    <path
+        android:fillColor="#29231B"
+        android:pathData="M90,8 C136,8 162,42 162,91 L162,228 L18,228 L18,91 C18,42 44,8 90,8 Z"/>
+
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#765B38"
+        android:strokeWidth="1.5"
+        android:pathData="M90,15 C132,15 155,46 155,91 L155,221 L25,221 L25,91 C25,46 48,15 90,15 Z"/>
+
+    <!-- Neck -->
+    <path
+        android:fillColor="#936B48"
+        android:pathData="M73,132 L72,161 C81,173 102,173 110,158 L106,130 Z"/>
+
+    <!-- Face -->
+    <path
+        android:fillColor="#A67B53"
+        android:pathData="M55,72 C55,48 70,36 91,36 C113,36 128,52 127,78 L123,116 C119,135 105,150 91,151 C76,149 61,135 58,116 Z"/>
+
+    <!-- Face shadow -->
+    <path
+        android:fillColor="#694B35"
+        android:pathData="M91,38 C113,38 127,53 127,78 L123,116 C119,136 105,150 91,151 C104,130 106,106 105,80 C105,60 99,47 91,38 Z"/>
+
+    <!-- Hair -->
+    <path
+        android:fillColor="#211B17"
+        android:pathData="M55,82 C51,59 62,38 79,32 C101,21 124,39 130,65 L126,86 C119,72 113,67 103,64 C91,72 73,74 55,82 Z"/>
+
+    <!-- Fedora crown -->
+    <path
+        android:fillColor="#211B17"
+        android:strokeColor="#C09350"
+        android:strokeWidth="2"
+        android:pathData="M45,59 C46,33 58,17 89,16 C119,16 131,34 134,59 L125,66 C101,59 72,60 45,66 Z"/>
+
+    <!-- Fedora band -->
+    <path
+        android:fillColor="#926B3D"
+        android:pathData="M47,57 C72,52 108,52 132,57 L133,65 C106,61 73,61 45,67 Z"/>
+
+    <!-- Fedora brim -->
+    <path
+        android:fillColor="#211B17"
+        android:strokeColor="#C09350"
+        android:strokeWidth="2"
+        android:pathData="M24,68 C53,55 123,55 156,69 C139,83 51,84 24,68 Z"/>
+
+    <!-- Eyebrows -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#33231A"
+        android:strokeWidth="3"
+        android:pathData="M65,94 L82,91 M98,91 L115,94"/>
+
+    <!-- Eyes -->
+    <path
+        android:fillColor="#211B17"
+        android:pathData="M71,100 C74,98 78,98 80,101 C78,106 73,106 71,100 Z M103,100 C106,98 110,98 112,101 C110,106 105,106 103,100 Z"/>
+
+    <!-- Nose -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#684A32"
+        android:strokeWidth="2"
+        android:pathData="M89,101 L85,119 Q89,123 96,119"/>
+
+    <!-- Moustache -->
+    <path
+        android:fillColor="#34261D"
+        android:pathData="M72,126 C79,119 85,122 91,127 C98,121 105,120 112,126 C107,139 98,136 91,132 C83,138 76,137 72,126 Z"/>
+
+    <!-- Shirt -->
+    <path
+        android:fillColor="#C8B18A"
+        android:pathData="M70,151 L90,172 L111,151 L124,224 L55,224 Z"/>
+
+    <!-- Shirt collar -->
+    <path
+        android:fillColor="#E1D0B1"
+        android:pathData="M72,151 L89,169 L77,184 L63,158 Z M108,151 L91,169 L104,184 L118,158 Z"/>
+
+    <!-- Tie -->
+    <path
+        android:fillColor="#7D382B"
+        android:strokeColor="#C0925C"
+        android:strokeWidth="1"
+        android:pathData="M84,168 L91,174 L98,168 L95,181 L102,214 L90,226 L78,214 L85,181 Z"/>
+
+    <!-- Trench coat -->
+    <path
+        android:fillColor="#29231D"
+        android:strokeColor="#A67C47"
+        android:strokeWidth="2"
+        android:pathData="M72,153 C53,160 34,174 29,198 L24,229 L156,229 L151,198 C146,174 128,160 108,153 L91,174 Z"/>
+
+    <!-- Coat lapels -->
+    <path
+        android:fillColor="#463326"
+        android:strokeColor="#A67C47"
+        android:strokeWidth="1.5"
+        android:pathData="M72,153 L91,174 L77,202 L57,164 Z M108,153 L91,174 L105,202 L123,164 Z"/>
+
+    <!-- Coat buttons -->
+    <path
+        android:fillColor="#C99A55"
+        android:pathData="M91,190 A2,2 0 1,0 91,194 A2,2 0 1,0 91,190 Z M91,205 A2,2 0 1,0 91,209 A2,2 0 1,0 91,205 Z"/>
+
+    <!-- Pocket -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#A67C47"
+        android:strokeWidth="1.5"
+        android:pathData="M117,183 L137,188 L133,203 L113,198 Z"/>
+
+</vector>

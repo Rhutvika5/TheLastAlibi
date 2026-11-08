@@ -1,0 +1,86 @@
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="180dp"
+    android:height="220dp"
+    android:viewportWidth="100"
+    android:viewportHeight="130">
+
+    <!-- Detective hat crown -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#C99A55"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M 29,31 L 34,14
+            C 45,8 62,9 72,17
+            L 77,31" />
+
+    <!-- Hat brim -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#C99A55"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M 14,33
+            C 31,27 70,27 88,34
+            C 71,40 33,40 14,33 Z" />
+
+    <!-- Face outline -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#C99A55"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M 33,37
+            C 31,48 35,59 45,64
+            C 54,68 64,61 68,53
+            L 73,49
+            L 68,45
+            L 68,37" />
+
+    <!-- Neck -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#C99A55"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M 42,64 L 41,73
+            M 59,62 L 62,73" />
+
+    <!-- Coat shoulders -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#C99A55"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M 41,71
+            C 25,74 12,85 8,101
+            L 5,126
+            M 62,71
+            C 78,76 89,88 93,103
+            L 96,126" />
+
+    <!-- Coat collar -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#C99A55"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M 41,72 L 34,88 L 49,81
+            M 62,72 L 70,88 L 54,81" />
+
+    <!-- Coat centre -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#C99A55"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M 49,81 L 50,126
+            M 54,81 L 54,126" />
+
+</vector>
