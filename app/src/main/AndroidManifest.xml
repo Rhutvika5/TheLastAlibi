@@ -11,13 +11,14 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="The Last Alibi">
+        android:label="The Last Alibi"
+        android:theme="@style/Theme.TheLastAlibi">
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
+            android:theme="@style/Theme.TheLastAlibi">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,67 +31,67 @@
             android:name=".LevelSelectActivity"
             android:exported="false"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+            android:theme="@style/Theme.TheLastAlibi" />
 
         <activity
             android:name=".IntroActivity"
             android:exported="false"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+            android:theme="@style/Theme.TheLastAlibi" />
 
         <activity
             android:name=".HubActivity"
             android:exported="false"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+            android:theme="@style/Theme.TheLastAlibi" />
 
         <activity
             android:name=".LocationsActivity"
             android:exported="false"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+            android:theme="@style/Theme.TheLastAlibi" />
 
         <activity
             android:name=".LocationDetailActivity"
             android:exported="false"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+            android:theme="@style/Theme.TheLastAlibi" />
 
         <activity
             android:name=".SuspectsActivity"
             android:exported="false"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+            android:theme="@style/Theme.TheLastAlibi" />
 
         <activity
             android:name=".SuspectProfileActivity"
             android:exported="false"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+            android:theme="@style/Theme.TheLastAlibi" />
 
         <activity
             android:name=".JournalActivity"
             android:exported="false"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+            android:theme="@style/Theme.TheLastAlibi" />
 
         <activity
             android:name=".BellPuzzleActivity"
             android:exported="false"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+            android:theme="@style/Theme.TheLastAlibi" />
 
         <activity
             android:name=".AccusationActivity"
             android:exported="false"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+            android:theme="@style/Theme.TheLastAlibi" />
 
         <activity
             android:name=".ReportActivity"
             android:exported="false"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+            android:theme="@style/Theme.TheLastAlibi" />
 
     </application>
 

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.graphics.Typeface
 import android.os.Bundle
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
@@ -28,6 +29,11 @@ abstract class BaseScreen : Activity() {
         subtitleView = findViewById(R.id.screenSubtitle)
         content = findViewById(R.id.content)
         findViewById<Button>(R.id.backButton).setOnClickListener { finish() }
+        findViewById<View>(R.id.screenTitle).post {
+            findViewById<View>(R.id.screenTitle).alpha = 0f
+            findViewById<View>(R.id.screenTitle).translationY = dp(-8).toFloat()
+            findViewById<View>(R.id.screenTitle).animate().alpha(1f).translationY(0f).setDuration(220).start()
+        }
     }
 
     override fun onResume() {
@@ -38,6 +44,9 @@ abstract class BaseScreen : Activity() {
     protected fun refresh() {
         content.removeAllViews()
         render()
+        content.alpha = 0f
+        content.translationY = dp(10).toFloat()
+        content.animate().alpha(1f).translationY(0f).setDuration(180).start()
     }
 
     protected fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
@@ -82,6 +91,13 @@ abstract class BaseScreen : Activity() {
             b.setTextColor(color(R.color.alibi_muted))
         }
         b.setOnClickListener { onClick() }
+        b.setOnTouchListener { view, event ->
+            when (event.actionMasked) {
+                android.view.MotionEvent.ACTION_DOWN -> view.animate().scaleX(.985f).scaleY(.985f).setDuration(70).start()
+                android.view.MotionEvent.ACTION_UP, android.view.MotionEvent.ACTION_CANCEL -> view.animate().scaleX(1f).scaleY(1f).setDuration(100).start()
+            }
+            false
+        }
         content.addView(b, params(10))
         return b
     }
@@ -102,12 +118,19 @@ abstract class BaseScreen : Activity() {
         val b = TextView(this)
         b.text = body
         b.textSize = 15f
-        b.setTextColor(color(R.color.alibi_text))
+        b.setTextColor(0xFF302419.toInt())
         card.addView(b, params(6))
 
         if (onClick != null) {
             card.isClickable = true
             card.setOnClickListener { onClick() }
+            card.setOnTouchListener { view, event ->
+                when (event.actionMasked) {
+                    android.view.MotionEvent.ACTION_DOWN -> view.animate().alpha(.86f).setDuration(70).start()
+                    android.view.MotionEvent.ACTION_UP, android.view.MotionEvent.ACTION_CANCEL -> view.animate().alpha(1f).setDuration(100).start()
+                }
+                false
+            }
         }
         content.addView(card, params(12))
         return card

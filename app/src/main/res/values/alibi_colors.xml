@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="alibi_bg">#101B2B</color>
-    <color name="alibi_card">#1B2A41</color>
-    <color name="alibi_accent">#E0A526</color>
-    <color name="alibi_text">#FFFFFF</color>
-    <color name="alibi_muted">#A9B8CC</color>
-    <color name="alibi_danger">#E5573F</color>
-    <color name="alibi_success">#3DBE7A</color>
-    <color name="alibi_disabled">#3A475C</color>
+    <!-- Shared noir palette: coal, aged paper, brass, ivory, and restrained evidence red. -->
+    <color name="alibi_bg">#0D0B09</color>
+    <color name="alibi_card">#211B16</color>
+    <color name="alibi_accent">#D6A85D</color>
+    <color name="alibi_text">#F0E4CF</color>
+    <color name="alibi_muted">#A9987D</color>
+    <color name="alibi_danger">#A83B32</color>
+    <color name="alibi_success">#7D9A68</color>
+    <color name="alibi_disabled">#3A332B</color>
 </resources>

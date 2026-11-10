@@ -4,13 +4,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:fitsSystemWindows="true"
-    android:background="@color/alibi_bg">
+    android:background="@drawable/bg_screen_scene">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:layout_margin="18dp"
+        android:padding="18dp"
+        android:background="@drawable/bg_glass_panel">
 
         <TextView
             android:id="@+id/screenTitle"
@@ -18,14 +20,17 @@
             android:layout_height="wrap_content"
             android:textColor="@color/alibi_accent"
             android:textSize="26sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:fontFamily="@font/special_elite"
+            android:letterSpacing="0.055" />
 
         <TextView
             android:id="@+id/screenSubtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/alibi_muted"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:layout_marginTop="4dp" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -46,9 +51,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:background="@drawable/bg_button_disabled"
+            android:background="@drawable/bg_title_secondary_button"
             android:textAllCaps="false"
             android:textColor="@color/alibi_text"
-            android:text="Back" />
+            android:text="← RETURN TO CASE" />
     </LinearLayout>
 </LinearLayout>
