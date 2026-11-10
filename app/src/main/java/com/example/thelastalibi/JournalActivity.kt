@@ -105,7 +105,7 @@ class JournalActivity : BaseScreen() {
 
         root.fitsSystemWindows = false
         root.setPadding(0, 0, 0, 0)
-        root.setBackgroundColor(Color.rgb(10, 11, 13))
+        root.setBackgroundResource(R.drawable.bg_noir_office)
 
         findViewById<TextView>(R.id.screenTitle).visibility = View.GONE
         findViewById<TextView>(R.id.screenSubtitle).visibility = View.GONE
@@ -114,7 +114,7 @@ class JournalActivity : BaseScreen() {
         val screenColumn = scrollView.parent as LinearLayout
 
         screenColumn.setPadding(0, 0, 0, 0)
-        screenColumn.setBackgroundColor(Color.rgb(10, 11, 13))
+        screenColumn.setBackgroundColor(Color.TRANSPARENT)
 
         // Remove previous toolbar when refresh() is called.
         val oldToolbar =

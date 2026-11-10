@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0C0D10">
+    android:background="@drawable/bg_noir_office">
 
     <!-- TOP HEADER -->
     <LinearLayout
@@ -14,7 +14,7 @@
         android:gravity="center_vertical"
         android:paddingStart="28dp"
         android:paddingEnd="28dp"
-        android:background="#101114">
+        android:background="#D90A0908">
 
         <TextView
             android:layout_width="wrap_content"
@@ -80,20 +80,20 @@
         android:id="@+id/prologueContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="25dp"
-        android:layout_marginEnd="25dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginEnd="36dp"
         android:layout_marginTop="65dp"
         android:layout_marginBottom="15dp"
         android:orientation="horizontal"
         android:gravity="center"
         android:baselineAligned="false">
 
-        <!-- STORY PANEL: 75% WIDTH -->
+        <!-- STORY PANEL -->
         <LinearLayout
             android:id="@+id/storyPanel"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="3"
+            android:layout_weight="1.15"
             android:orientation="vertical"
             android:background="@drawable/bg_title_card"
             android:padding="16dp">
@@ -105,7 +105,7 @@
                 android:layout_height="wrap_content"
                 android:text="PROLOGUE"
                 android:textColor="#EFAF43"
-                android:textSize="18sp"
+                android:textSize="23sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/special_elite"
                 android:letterSpacing="0.12" />
@@ -142,7 +142,7 @@
                     android:layout_height="wrap_content"
                     android:text=""
                     android:textColor="#E8DCC7"
-                    android:textSize="17sp"
+                    android:textSize="15sp"
                     android:fontFamily="@font/special_elite"
                     android:lineSpacingExtra="8dp"
                     android:letterSpacing="0.015"
@@ -198,16 +198,16 @@
 
         </LinearLayout>
 
-        <!-- NARRATOR PANEL: 25% WIDTH -->
+        <!-- NARRATOR PANEL -->
         <LinearLayout
             android:id="@+id/narratorPanel"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_marginStart="13dp"
+            android:layout_weight="0.85"
+            android:layout_marginStart="11dp"
             android:orientation="vertical"
             android:gravity="center"
-            android:background="@drawable/bg_title_card"
+            android:background="@drawable/bg_glass_panel"
             android:padding="10dp">
 
             <TextView

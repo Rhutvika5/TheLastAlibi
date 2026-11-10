@@ -3,7 +3,7 @@
     android:id="@+id/hubRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#100F0D"
+    android:background="@drawable/bg_noir_office"
     android:clipChildren="false">
 
     <!-- HEADER -->
@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="9dp"
-            android:text="INVESTIGATION DESK"
+            android:text="THE LAST ALIBI"
             android:textColor="#E8C78F"
             android:textSize="17sp"
             android:textStyle="bold"
@@ -112,7 +112,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_marginEnd="5dp"
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:padding="13dp"
                 android:background="@drawable/bg_hub_card"
@@ -120,28 +120,35 @@
                 android:focusable="true">
 
                 <ImageView
-                    android:layout_width="27dp"
-                    android:layout_height="27dp"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
                     android:src="@drawable/ic_location_pin"
                     android:contentDescription="Location" />
 
-                <TextView
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="9dp"
-                    android:text="LOCATIONS"
-                    android:textColor="#E8E5DF"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:fontFamily="sans-serif-medium" />
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="7dp"
-                    android:text="Explore Greywood"
-                    android:textColor="#B9A485"
-                    android:textSize="12sp" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="LOCATIONS"
+                        android:textColor="#E8E5DF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Explore the crime scene"
+                        android:textColor="#B9A485"
+                        android:textSize="12sp" />
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -152,7 +159,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_marginStart="5dp"
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:padding="13dp"
                 android:background="@drawable/bg_hub_card"
@@ -160,28 +167,35 @@
                 android:focusable="true">
 
                 <ImageView
-                    android:layout_width="27dp"
-                    android:layout_height="27dp"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
                     android:src="@drawable/ic_hub_people"
                     android:contentDescription="Suspects" />
 
-                <TextView
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="9dp"
-                    android:text="SUSPECTS"
-                    android:textColor="#E8E5DF"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:fontFamily="sans-serif-medium" />
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="7dp"
-                    android:text="Investigate alibis"
-                    android:textColor="#B9A485"
-                    android:textSize="12sp" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="SUSPECTS"
+                        android:textColor="#E8E5DF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Investigate the suspects"
+                        android:textColor="#B9A485"
+                        android:textSize="12sp" />
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -202,7 +216,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_marginEnd="5dp"
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:padding="13dp"
                 android:background="@drawable/bg_hub_card"
@@ -210,28 +224,35 @@
                 android:focusable="true">
 
                 <ImageView
-                    android:layout_width="27dp"
-                    android:layout_height="27dp"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
                     android:src="@drawable/ic_hub_folder"
                     android:contentDescription="Evidence" />
 
-                <TextView
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="9dp"
-                    android:text="EVIDENCE"
-                    android:textColor="#E8E5DF"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:fontFamily="sans-serif-medium" />
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="7dp"
-                    android:text="Collected clues"
-                    android:textColor="#B9A485"
-                    android:textSize="12sp" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="EVIDENCE"
+                        android:textColor="#E8E5DF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Analyze the clues"
+                        android:textColor="#B9A485"
+                        android:textSize="12sp" />
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -242,7 +263,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_marginStart="5dp"
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:padding="13dp"
                 android:background="@drawable/bg_hub_card"
@@ -250,28 +271,35 @@
                 android:focusable="true">
 
                 <ImageView
-                    android:layout_width="27dp"
-                    android:layout_height="27dp"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
                     android:src="@drawable/ic_hub_bulb"
                     android:contentDescription="Hints" />
 
-                <TextView
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="9dp"
-                    android:text="HINTS &amp; NOTES"
-                    android:textColor="#E8E5DF"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:fontFamily="sans-serif-medium" />
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="7dp"
-                    android:text="Review findings"
-                    android:textColor="#B9A485"
-                    android:textSize="12sp" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="HINTS &amp; NOTES"
+                        android:textColor="#E8E5DF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Unlock helpful hints"
+                        android:textColor="#B9A485"
+                        android:textSize="12sp" />
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -281,7 +309,7 @@
         <LinearLayout
             android:id="@+id/saveAaravCard"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="74dp"
             android:layout_marginTop="9dp"
             android:orientation="horizontal"
             android:gravity="center_vertical"
