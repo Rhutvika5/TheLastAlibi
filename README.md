@@ -1,7 +1,7 @@
 # The Last Alibi: Member 1 (Android UI & Integration)
 
 ## Download
-[**Download the APK**](delivery/TheLastAlibi-Noir-Redesign.apk?raw=1)
+[**Download The LastAlibi APK**](delivery/TheLastAlibi.apk?raw=1)
 
 Kotlin + XML screens that talk to a game engine through a small JSON contract.
 Ships with a `FakeEngine` (Chapter 1, Level 1: The Missing Resident) so the app is playable now.
