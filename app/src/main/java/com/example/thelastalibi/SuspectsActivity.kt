@@ -368,43 +368,6 @@ class SuspectsActivity : Activity() {
                 Color.rgb(211, 174, 110)
             )
 
-            val placeholder = TextView(this).apply {
-
-                text = "PORTRAIT NOT ADDED"
-
-                textSize = 8f
-
-                gravity = Gravity.CENTER
-
-                setTextColor(
-                    Color.rgb(211, 174, 110)
-                )
-
-                setBackgroundColor(
-                    Color.argb(150, 30, 27, 23)
-                )
-
-                setPadding(
-                    dp(6),
-                    dp(4),
-                    dp(6),
-                    dp(4)
-                )
-            }
-
-            val placeholderParams =
-                FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
-                )
-
-            placeholderParams.bottomMargin = dp(5)
-
-            photoFrame.addView(
-                placeholder,
-                placeholderParams
-            )
         }
 
         content.addView(

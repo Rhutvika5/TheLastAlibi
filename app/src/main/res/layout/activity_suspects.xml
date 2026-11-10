@@ -3,7 +3,7 @@
     android:id="@+id/suspectsRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#211911">
+    android:background="@drawable/bg_noir_office">
 
     <!-- TOP HEADER -->
     <LinearLayout

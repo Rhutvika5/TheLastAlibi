@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
@@ -99,7 +100,7 @@ class LevelSelectActivity : Activity() {
     private fun createScreen(): View {
 
         val root = FrameLayout(this)
-        root.setBackgroundColor(dark)
+        root.setBackgroundResource(R.drawable.bg_noir_office)
 
         val chapters = loadChapters()
 
@@ -133,7 +134,7 @@ class LevelSelectActivity : Activity() {
 
         // Raised folder tab
         val folderTab = makeText(
-            "▤  ARCHIVE ARCHITECT – CASE SELECTOR",
+            "GREYWOOD POLICE ARCHIVE  •  CASE FILE 409",
             15f,
             ink,
             true
@@ -322,10 +323,11 @@ class LevelSelectActivity : Activity() {
 
         // Main menu
         val menu = makeText(
-            "Main Menu",
+            "←",
             14f,
             Color.rgb(220, 210, 195)
         ).apply {
+            id = R.id.menuButton
             gravity = Gravity.CENTER
 
             background = roundedBackground(
@@ -552,6 +554,29 @@ class LevelSelectActivity : Activity() {
             gravity = Gravity.CENTER_VERTICAL
         }
 
+        val caseImage = ImageView(this).apply {
+            setImageResource(R.drawable.ic_greywood_skyline)
+            scaleType = ImageView.ScaleType.CENTER_CROP
+            contentDescription = "Greywood case photograph"
+            background = roundedBackground(
+                Color.rgb(28, 29, 29),
+                Color.rgb(109, 80, 52),
+                1,
+                3
+            )
+            clipToOutline = true
+        }
+
+        detailsRow.addView(
+            caseImage,
+            LinearLayout.LayoutParams(
+                dp(96),
+                dp(78)
+            ).apply {
+                marginEnd = dp(12)
+            }
+        )
+
         // Left side: title and description
         val details = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -624,7 +649,7 @@ class LevelSelectActivity : Activity() {
         detailsRow.addView(
             action,
             LinearLayout.LayoutParams(
-                dp(125),
+                dp(82),
                 ViewGroup.LayoutParams.WRAP_CONTENT
             ).apply {
                 marginStart = dp(8)
@@ -691,7 +716,7 @@ class LevelSelectActivity : Activity() {
 
         footer.addView(
             makeText(
-                "C++ Engine: Connected",
+                "CASE #409  •  FIELD ASSIGNMENT",
                 14f,
                 muted
             )

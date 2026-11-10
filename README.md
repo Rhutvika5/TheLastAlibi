@@ -1,5 +1,8 @@
 # The Last Alibi: Member 1 (Android UI & Integration)
 
+## Download
+[**Download The LastAlibi APK**](delivery/TheLastAlibi.apk?raw=1)
+
 Kotlin + XML screens that talk to a game engine through a small JSON contract.
 Ships with a `FakeEngine` (Chapter 1, Level 1: The Missing Resident) so the app is playable now.
 Switch to the real C++ engine later by changing ONE line in `Game.kt`.
@@ -35,7 +38,7 @@ Home -> Level Select -> Story Intro -> Hub -> (Locations -> Location Detail) / (
 | Function | Returns |
 |---|---|
 | `getLevels()` | `[{"id":1,"chapter":1,"chapterTitle":"...","title":"...","locked":false}]` (chapter fields optional) |
-| `getCaseInfo()` | `{"title":"...","intro":"...","finalLabel":"Draw Your Conclusion","question":"What happened to Aarav?","storyPages":["page 1","page 2"]}` (storyPages optional; falls back to `intro`) |
+| `getCaseInfo()` | `{"title":"...","intro":"...","finalLabel":"Draw Your Conclusion","question":"What happened to Aarav?","storyPages":["page 1","page 2"]}` (storyPages optional; falls back to intro) |
 | `getLocations()` | `[{"id","name","description","cluesFound","cluesTotal"}]` |
 | `getLocationDetail(id)` | `{"id","name","description","clues":[{"id","spot","collected"}]}` |
 | `collectClue(locId, clueId)` | `{"success":true,"title":"...","message":"..."}` |

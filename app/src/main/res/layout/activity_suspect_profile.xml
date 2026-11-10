@@ -3,7 +3,7 @@
     android:id="@+id/profileRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#100F0D"
+    android:background="@drawable/bg_noir_office"
     android:clipChildren="false">
 
     <!-- HEADER -->
@@ -15,7 +15,7 @@
         android:gravity="center_vertical"
         android:paddingStart="14dp"
         android:paddingEnd="20dp"
-        android:background="#0D0C0A">
+        android:background="#D90A0908">
 
         <!-- BACK BUTTON - LEFT CORNER -->
         <TextView
@@ -83,7 +83,7 @@
         android:orientation="horizontal"
         android:layout_marginTop="70dp"
         android:layout_marginBottom="16dp"
-        android:layout_marginStart="62dp"
+        android:layout_marginStart="54dp"
         android:layout_marginEnd="20dp">
 
         <!-- LEFT: DIALOGUE AND CHARACTER -->
@@ -91,21 +91,49 @@
             android:id="@+id/characterPanel"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="0.95"
             android:layout_marginEnd="7dp"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:padding="11dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="7dp"
             android:background="@drawable/bg_profile_panel">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.05"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <FrameLayout
+                    android:id="@+id/characterContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:clipChildren="false" />
+
+                <TextView
+                    android:id="@+id/characterCaption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="TOWN DOCTOR"
+                    android:textColor="#D5B47C"
+                    android:textSize="10sp"
+                    android:gravity="center"
+                    android:fontFamily="@font/special_elite"
+                    android:paddingBottom="5dp" />
+            </LinearLayout>
 
             <!-- DIALOGUE BOX -->
             <LinearLayout
                 android:id="@+id/dialogueBox"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.95"
+                android:layout_marginStart="5dp"
                 android:orientation="vertical"
-                android:padding="17dp"
+                android:gravity="center"
+                android:padding="11dp"
                 android:background="@drawable/bg_profile_dialogue">
 
                 <TextView
@@ -122,8 +150,7 @@
 
                 <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
+                    android:layout_height="match_parent"
                     android:fillViewport="true"
                     android:scrollbars="vertical">
 
@@ -135,7 +162,7 @@
                         android:padding="5dp"
                         android:text="At home during the night."
                         android:textColor="#39291D"
-                        android:textSize="18sp"
+                        android:textSize="16sp"
                         android:fontFamily="serif"
                         android:textStyle="italic"
                         android:lineSpacingExtra="5dp" />
@@ -144,25 +171,6 @@
 
             </LinearLayout>
 
-            <!-- CHARACTER -->
-            <FrameLayout
-                android:id="@+id/characterContainer"
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:layout_marginTop="5dp"
-                android:clipChildren="false" />
-
-            <TextView
-                android:id="@+id/characterCaption"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="TOWN DOCTOR"
-                android:textColor="#D5B47C"
-                android:textSize="10sp"
-                android:gravity="center"
-                android:fontFamily="@font/special_elite"
-                android:paddingBottom="5dp" />
-
         </LinearLayout>
 
         <!-- RIGHT: QUESTIONS -->
@@ -170,7 +178,7 @@
             android:id="@+id/questionsPanel"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="1.05"
             android:layout_marginStart="7dp"
             android:orientation="vertical"
             android:padding="15dp"
