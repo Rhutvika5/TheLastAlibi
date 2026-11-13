@@ -35,17 +35,10 @@ class ReportActivity : BaseScreen() {
                     optionId == 5
 
         val title = when {
-            rescued && noFormalAccusation ->
-                "MYSTERY SOLVED"
-
-            !rescued ->
-                "An Unresolved Dawn"
-
-            optionId == 3 ->
-                "Aarav Saved — Dev Accused"
-
-            else ->
-                "Aarav Saved — Wrong Accusation"
+            rescued && noFormalAccusation -> ""
+            !rescued -> "An Unresolved Dawn"
+            optionId == 3 -> "Aarav Saved — Dev Accused"
+            else -> "Aarav Saved — Wrong Accusation"
         }
 
         val label = when {
@@ -62,10 +55,22 @@ class ReportActivity : BaseScreen() {
                 "Aarav is safe, but your accusation was incorrect."
         }
 
-        val message = result.optString(
+        val engineMessage = result.optString(
             "message",
             "Your final decision has been recorded."
         )
+
+        val message = if (rescued) {
+            engineMessage.replace(
+                "You failed to save Aarav. Whether you saved Aarav or not, the truth remains the same. ",
+                ""
+            )
+        } else {
+            engineMessage.replace(
+                "You saved Aarav by solving the bell puzzle. The bell's power brought him back safely. ",
+                "You failed to save Aarav. Whether you saved Aarav or not, the truth remains the same. "
+            )
+        }
 
         val cluesFound = result.optInt("cluesFound", 0)
         val cluesTotal = result.optInt("cluesTotal", 0)

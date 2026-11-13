@@ -356,12 +356,13 @@ class FakeEngine : GameEngine {
     )
 
     private val accusationOptions = listOf(
-        Option(1, "Accuse Dr. Mira, the town doctor."),
-        Option(2, "Accuse Joseph, the bell caretaker."),
-        Option(3, "Accuse Dev, the radio operator."),
-        Option(4, "Accuse Noah, the recent arrival."),
-        Option(5, "Do not formally accuse Dev; the evidence is not enough.")
+        Option(id = 1, text = "Accuse Dr. Mira of keeping secrets."),
+        Option(id = 2, text = "Accuse Joseph of covering up his mistake."),
+        Option(id = 3, text = "Did Dev cause Aarav's disappearance?"),
+        Option(id = 4, text = "Accuse Noah of hiding the truth."),
+        Option(id = 5, text = "I'm not sure Dev is guilty.")
     )
+
     private val actualCulpritId = 3
 
     private fun active(): Level = levels.first { it.id == activeLevelId }
@@ -575,18 +576,29 @@ class FakeEngine : GameEngine {
         val found = collected.size
         val total = levels.sumOf { it.clues.size }
 
-        val truth = "Dev removed the bell's clapper and activated the old relay after an Echo imitated Lila's voice and promised he could reach his missing sister. He acted out of grief and desperation; he did not intend to make Aarav disappear. With the bell's protection gone, an Echo used Lila's copied voice to lure Aarav through the maintenance hatch and into the tunnels. Mira hid old reports because she feared panic. Joseph concealed his missed inspection because he feared blame. Noah kept the station map because he wanted to escape Greywood. The service-key record, missing clapper and relay log reveal Dev's role—but the evidence also shows that his intention was not to abduct Aarav."
-        val rescueText = if (aaravSaved) {
-            "The clapper is restored and the 2-1-2 bell pattern creates the brief quiet interval. The transmitter is shut down in time. The repeating signal dies, the Echoes fade, and Aarav is brought back safely."
+        val truth = if (formalNoAccusation) {
+            if (aaravSaved) {
+                "You saved Aarav by solving the bell puzzle. The bell's power brought him back safely. You chose not to formally accuse Dev, and it was the right decision. The evidence revealed that Dev removed the bell's clapper and activated the old radio relay. But he did it because an Echo copied Lila's voice and promised to help him find his missing sister. Dev acted out of grief and desperation, not because he wanted to hurt Aarav. He never intended to make Aarav disappear. An Echo used Lila's copied voice to trick Aarav into entering the tunnels through the maintenance hatch. How Aarav disappeared and what really happened in the tunnels remains a mystery."
+            } else {
+                "You failed to save Aarav. Whether you saved Aarav or not, the truth remains the same. You chose not to formally accuse Dev, and it was the right decision. The evidence revealed that Dev removed the bell's clapper and activated the old radio relay. But he did it because an Echo copied Lila's voice and promised to help him find his missing sister. Dev acted out of grief and desperation, not because he wanted to hurt Aarav. He never intended to make Aarav disappear. An Echo used Lila's copied voice to trick Aarav into entering the tunnels through the maintenance hatch. How Aarav disappeared and what really happened in the tunnels remains a mystery."
+            }
+        } else if (aaravSaved) {
+            "You saved Aarav by solving the bell puzzle. The bell's power brought him back safely. Dev had removed the bell's clapper and switched on the old radio relay. He did this because an Echo copied Lila's voice and promised to help him find his missing sister. Dev was desperate to find her, but he never intended to hurt Aarav or make him disappear. An Echo used Lila's copied voice to trick Aarav into entering the tunnels through the maintenance hatch. But how Aarav disappeared and what really happened in the tunnels is still a mystery."
         } else {
-            "The correct bell sequence was not completed with all the necessary evidence. The transmitter keeps repeating, and Aarav's fate remains uncertain in the tunnels. The case ends with an unresolved rescue."
+            "You failed to save Aarav. Whether you saved Aarav or not, the truth remains the same. Dev had removed the bell's clapper and switched on the old radio relay. He did this because an Echo copied Lila's voice and promised to help him find his missing sister. Dev was desperate to find her, but he never intended to hurt Aarav or make him disappear. An Echo used Lila's copied voice to trick Aarav into entering the tunnels through the maintenance hatch. But how Aarav disappeared and what really happened in the tunnels is still a mystery."
         }
+
         val decisionText = when {
-            accusedDev -> "You formally accuse Dev. The evidence supports that he removed the clapper and activated the relay, even though he did not intend Aarav's disappearance."
-            formalNoAccusation -> "You choose not to formally accuse Dev. You recognise his role in the bell's failure, but decide the evidence and his lack of intent do not justify a formal accusation at this time."
+            accusedDev -> "You formally accuse Dev."
+            formalNoAccusation -> ""
             else -> "You accuse ${selected.text.removePrefix("Accuse ").removeSuffix(".")}, but the strongest evidence points to Dev's actions at the bell and relay."
         }
-        val message = "$decisionText\n\n$truth\n\n$rescueText\n\nEnd of Chapter 1."
+
+        val message = if (decisionText.isBlank()) {
+            "$truth\n\nEnd of Chapter 1."
+        } else {
+            "$decisionText\n\n$truth\n\nEnd of Chapter 1."
+        }
         val title = when {
             !aaravSaved -> "An Unresolved Dawn"
             accusedDev -> "Aarav Saved — Dev Accused"
