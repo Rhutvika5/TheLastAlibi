@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#101018">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="THE SILENT BELL"
+            android:textColor="#D9B66A"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.08"
+            android:layout_marginTop="16dp"/>
+
+        <TextView
+            android:id="@+id/runeClue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Three ancient runes guard the counter-tone. Discover their forgotten order."
+            android:textColor="#E0D9C8"
+            android:textSize="15sp"
+            android:gravity="center"
+            android:padding="14dp"
+            android:layout_marginTop="12dp"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginTop="12dp">
+
+            <ImageView
+                android:id="@+id/bellImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/bell_puzzle"
+                android:scaleType="fitCenter"
+                android:contentDescription="Ancient bronze bell"/>
+
+            <LinearLayout
+                android:layout_width="280dp"
+                android:layout_height="65dp"
+                android:layout_gravity="center"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/runeOne"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:contentDescription="Left rune"/>
+
+                <TextView
+                    android:id="@+id/runeTwo"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:contentDescription="Center rune"/>
+
+                <TextView
+                    android:id="@+id/runeThree"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:contentDescription="Right rune"/>
+
+            </LinearLayout>
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="YOUR SEQUENCE"
+            android:textColor="#D9B66A"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="18dp"/>
+
+        <TextView
+            android:id="@+id/sequenceDisplay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="YOUR SEQUENCE: — — —"
+            android:textColor="#F1D18A"
+            android:textSize="22sp"
+            android:gravity="center"
+            android:padding="18dp"/>
+
+        <Button
+            android:id="@+id/ringButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="RESTORE THE BELL"
+            android:layout_marginTop="12dp"/>
+
+        <Button
+            android:id="@+id/resetButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="RESET SEQUENCE"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"/>
+
+    </LinearLayout>
+</ScrollView>

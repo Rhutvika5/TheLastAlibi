@@ -82,6 +82,12 @@
             android:theme="@style/Theme.TheLastAlibi" />
 
         <activity
+            android:name=".BellRunesActivity"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.TheLastAlibi" />
+
+        <activity
             android:name=".AccusationActivity"
             android:exported="false"
             android:screenOrientation="landscape"

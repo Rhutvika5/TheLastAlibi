@@ -6,12 +6,10 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
-import android.widget.FrameLayout
 import android.widget.TextView
 import org.json.JSONObject
 import kotlin.math.abs
@@ -274,7 +272,7 @@ class HubActivity : Activity() {
     // INVESTIGATION CARDS
     // ---------------------------------------------------------
 
-    private fun setupInvestigationCards() {
+        private fun setupInvestigationCards() {
 
         findViewById<View>(
             R.id.locationsCard
@@ -315,7 +313,7 @@ class HubActivity : Activity() {
         ).setOnClickListener {
 
             startActivity(
-                Intent(this, BellPuzzleActivity::class.java)
+                Intent(this, BellRunesActivity::class.java)
             )
         }
     }

@@ -1,10 +1,8 @@
 package com.example.thelastalibi
 
-import kotlin.apply
-
-
 import android.app.AlertDialog
 import android.content.Intent
+import kotlin.apply
 
 class BellPuzzleActivity : BaseScreen() {
 
@@ -52,38 +50,46 @@ class BellPuzzleActivity : BaseScreen() {
                         "Aarav can still be saved. What will you do?"
             )
             .setPositiveButton("Save Aarav") { _, _ ->
-
-                // Save Aarav only when the player chooses this option.
-                getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-                    .edit()
-                    .putBoolean(KEY_AARAV_RESCUED, true)
-                    .apply()
-
-                val intent = Intent(
-                    this,
-                    AccusationActivity::class.java
-                ).apply {
-                    putExtra("rescueSolved", true)
-                    putExtra("aaravRescuedByBell", true)
-                }
-
-                startActivity(intent)
-                finish()
+                openAccusationScreen(true)
             }
-            .setNegativeButton("Not Yet", null)
+            .setNegativeButton("Continue Without Saving") { _, _ ->
+                openAccusationScreen(false)
+            }
             .show()
     }
-
 
     private fun showWrongPattern() {
         AlertDialog.Builder(this)
             .setTitle("The Bell Remains Silent")
             .setMessage(
                 "That pattern does not restore the protective counter-tone. " +
-                        "Aarav has not been rescued yet. Try another pattern."
+                        "Aarav has not been rescued.\n\n" +
+                        "You can still continue the investigation and accuse a suspect."
             )
-            .setPositiveButton("Try Again", null)
+            .setPositiveButton("Continue to Accusation") { _, _ ->
+                openAccusationScreen(false)
+            }
+            .setNegativeButton("Try Again", null)
             .show()
+    }
+
+    private fun openAccusationScreen(aaravRescued: Boolean) {
+
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_AARAV_RESCUED, aaravRescued)
+            .apply()
+
+        val intent = Intent(
+            this,
+            AccusationActivity::class.java
+        ).apply {
+            putExtra("rescueSolved", aaravRescued)
+            putExtra("aaravRescuedByBell", aaravRescued)
+        }
+
+        startActivity(intent)
+        finish()
     }
 
     companion object {
